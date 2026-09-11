@@ -1,0 +1,32 @@
+[
+  {
+    "id": "case-01",
+    "jd": "We are hiring a Software Engineer. Must have strong TypeScript and Node.js experience. Required: REST API design. Preferred: GraphQL. You will collaborate with product and design.",
+    "company_url": "https://example.com",
+    "days": 5
+  },
+  {
+    "id": "case-02",
+    "jd": "Backend Engineer. Must have 5+ years Python. Required experience with PostgreSQL and distributed systems. Nice to have Kubernetes.",
+    "company_url": "https://www.python.org",
+    "days": 3
+  },
+  {
+    "id": "case-03",
+    "jd": "Short JD.\nBuild features.",
+    "company_url": "https://example.com",
+    "days": 1
+  },
+  {
+    "id": "case-04",
+    "jd": "Frontend Engineer. Must know React. Required accessibility knowledge. Behavioral: stakeholder communication.",
+    "company_url": "https://this-domain-should-not-resolve-xyz123.invalid",
+    "days": 4
+  },
+  {
+    "id": "case-05",
+    "jd": "Full-stack role. Must have TypeScript, React, Node. Required system design fundamentals. Experience with CI/CD is required. Preferred AWS.",
+    "company_url": "https://example.com",
+    "days": 7
+  }
+]

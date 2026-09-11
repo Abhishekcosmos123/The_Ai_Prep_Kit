@@ -1,0 +1,62 @@
+[
+  {
+    "id": "case-01-fullstack-typescript",
+    "jd": "Software Engineer — Platform\n\nAbout the role\nWe are hiring a mid-level Software Engineer to build APIs and internal tools that power our product. You will work closely with product and design.\n\nResponsibilities\n- Design and implement REST APIs in TypeScript/Node.js\n- Own features end-to-end from design review to production\n- Improve reliability, observability, and developer experience\n- Participate in on-call rotation and incident reviews\n\nRequirements (must have)\n- 3+ years professional software engineering experience\n- Strong TypeScript and Node.js\n- Experience designing REST APIs and relational data models (PostgreSQL)\n- Comfortable with Git, code review, and CI/CD basics\n- Clear written and verbal communication\n\nNice to have\n- GraphQL\n- Experience with Redis or message queues\n- Prior startup experience\n\nLocation: Remote (US time zones preferred)",
+    "company_url": "https://example.com",
+    "days": 5
+  },
+  {
+    "id": "case-02-backend-python",
+    "jd": "Backend Engineer\n\nWe need a Backend Engineer who can scale data-heavy services.\n\nMust have:\n- 5+ years Python experience\n- Strong PostgreSQL skills (schema design, indexing, query performance)\n- Experience with distributed systems (queues, retries, idempotency)\n- Familiarity with Docker and cloud deployments\n\nPreferred:\n- Kubernetes\n- Kafka or similar event streaming\n- Experience with Python async frameworks (FastAPI/asyncio)\n\nYou will collaborate with data science and infrastructure teams to ship reliable batch and real-time pipelines.",
+    "company_url": "https://www.python.org",
+    "days": 3
+  },
+  {
+    "id": "case-03-thin-jd",
+    "jd": "Short JD.\nBuild features.\nShip fast.",
+    "company_url": "https://example.com",
+    "days": 1
+  },
+  {
+    "id": "case-04-unreachable-company",
+    "jd": "Frontend Engineer\n\nMust know React and modern JavaScript/TypeScript.\nRequired: accessibility (WCAG) knowledge and component-driven UI.\nBehavioral: stakeholder communication and design collaboration.\nNice to have: Next.js and Storybook.\n\nYou will own customer-facing UI for our dashboard product.",
+    "company_url": "https://this-domain-should-not-resolve-xyz123.invalid",
+    "days": 4
+  },
+  {
+    "id": "case-05-dense-requirements",
+    "jd": "Full-Stack Engineer\n\nMust have:\n- TypeScript\n- React\n- Node.js\n- System design fundamentals\n- CI/CD experience (GitHub Actions or similar)\n- Automated testing (unit + integration)\n\nRequired domain experience:\n- Building multi-tenant SaaS features\n- AuthN/AuthZ patterns (sessions/JWT/RBAC)\n\nPreferred:\n- AWS (ECS or Lambda)\n- Observability (OpenTelemetry, Datadog, or similar)\n- Experience mentoring juniors\n\nThis role blends product feature work with reliability improvements.",
+    "company_url": "https://stripe.com",
+    "days": 7
+  },
+  {
+    "id": "case-06-frontend-product",
+    "jd": "Senior Frontend Engineer\n\nJoin our product engineering team to craft high-quality web experiences.\n\nWhat you'll do\n- Build performant React interfaces with strong UX polish\n- Partner with designers on interaction details and accessibility\n- Improve frontend architecture, testing, and bundle performance\n\nMust-haves\n- Expert React and TypeScript\n- Deep understanding of browser performance and accessibility\n- Experience with design systems / component libraries\n- Ability to lead technical discussions and mentor others\n\nNice-to-haves\n- Next.js App Router\n- Experience with animation and complex forms\n- GraphQL clients (Apollo/urql)\n\nInterview process includes a UI take-home and a system design conversation focused on frontend architecture.",
+    "company_url": "https://vercel.com",
+    "days": 10
+  },
+  {
+    "id": "case-07-pm-behavioral",
+    "jd": "Product Manager — Growth\n\nWe are looking for a Product Manager to own activation and retention experiments.\n\nResponsibilities\n- Define problem statements and success metrics\n- Run A/B tests and interpret results with data partners\n- Write crisp PRDs and align engineering/design stakeholders\n- Present roadmap tradeoffs to leadership\n\nMust have\n- 4+ years product management experience in B2B or consumer SaaS\n- Strong analytical skills (SQL preferred)\n- Excellent stakeholder communication and prioritization\n- Experience shipping experiments end-to-end\n\nNice to have\n- Prior growth or monetization ownership\n- Familiarity with Amplitude/Mixpanel\n- Technical background sufficient to discuss API constraints\n\nBehavioral focus: conflict resolution, ambiguous problem framing, and customer empathy.",
+    "company_url": "https://www.notion.so",
+    "days": 6
+  },
+  {
+    "id": "case-08-devops-sre",
+    "jd": "Site Reliability Engineer\n\nOwn reliability for customer-facing services.\n\nRequired\n- Production experience with Linux systems and networking basics\n- Infrastructure as code (Terraform or equivalent)\n- Observability: metrics, logs, traces, SLOs/error budgets\n- Incident response and blameless postmortems\n- Scripting in Python or Go\n\nPreferred\n- Kubernetes in production\n- Chaos engineering or load testing practice\n- Multi-cloud experience\n\nYou will partner with application teams to improve deploy safety and reduce MTTR.",
+    "company_url": "https://github.com",
+    "days": 8
+  },
+  {
+    "id": "case-09-data-ml",
+    "jd": "Machine Learning Engineer\n\nBuild and productionize ML features for search and recommendations.\n\nMust have\n- Strong Python and software engineering fundamentals\n- Experience training and evaluating ML models\n- Familiarity with feature pipelines and offline/online evaluation\n- Ability to collaborate with product on metric definitions\n\nRequired technical skills\n- SQL and data warehousing concepts\n- Experience deploying models behind APIs or batch jobs\n\nNice to have\n- PyTorch or TensorFlow\n- Vector search / embeddings\n- Experience with LLM application patterns (RAG, evaluation harnesses)\n\nSeniority: Mid to Senior. Location: Hybrid.",
+    "company_url": "https://openai.com",
+    "days": 14
+  },
+  {
+    "id": "case-10-long-schedule-junior",
+    "jd": "Junior Software Engineer (New Grad)\n\nWe hire curious engineers who learn quickly and write clear code.\n\nRequirements\n- CS degree or equivalent practical experience\n- Comfortable with at least one language (JavaScript/TypeScript, Python, or Java)\n- Understanding of data structures and algorithms basics\n- Willingness to ask questions and accept feedback\n\nYou will\n- Ship small features with mentorship\n- Write tests and documentation\n- Participate in code review\n\nPreferred\n- Internship experience\n- Side projects or open-source contributions\n- Exposure to web development or APIs\n\nThis case is meant to exercise a longer prep window with a lighter JD.",
+    "company_url": "https://www.mozilla.org",
+    "days": 21
+  }
+]
