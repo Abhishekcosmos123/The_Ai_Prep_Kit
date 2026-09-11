@@ -317,14 +317,39 @@ Next session sorts flashcards by ascending confidence; cards never practiced are
 Practice mode also shows **covered vs not covered** (rated at least once vs never rated) before a session starts.
 ---
 
-## Limitations
+## Deployment (Railway)
 
-- Free-tier LLM rate limits can slow generation
-- Crawling is best-effort (robots, JS-heavy sites, anti-bot pages)
-- Public interview snippets are noisy and non-authoritative
-- Thin JDs produce thin kits (by design — no invented requirements)
-- Company research failures produce honest “missing info” briefs rather than fabricated facts
-- **Deployment:** host the API and Next.js app on free tiers (Render/Railway/Fly + Vercel). Set `CLIENT_ORIGIN`, `COOKIE_SECURE=true`, `ALLOW_LOCAL_URLS=false`, and `NEXT_PUBLIC_API_URL` to the public API URL. A public deploy URL is still required for submission.
+1. Create a Railway service from this GitHub repo.
+2. Set **Root Directory** to `server` (Service → Settings → Root Directory).
+3. Set variables (at minimum):
+
+```env
+NODE_ENV=production
+PORT=4000
+MONGODB_URI=mongodb+srv://USER:PASS@CLUSTER/the_ai_prep_kit
+JWT_SECRET=long-random-string
+CLIENT_ORIGIN=https://YOUR-FRONTEND.vercel.app
+COOKIE_SECURE=true
+COOKIE_SAMESITE=none
+LLM_API_KEY=
+LLM_PROVIDER=mock
+ALLOW_LOCAL_URLS=false
+```
+
+4. Deploy. Confirm:
+
+```bash
+curl https://YOUR-SERVICE.up.railway.app/api/health
+# {"ok":true,"service":"the-ai-prep-kit","version":"1.0"}
+```
+
+Production start uses `npm run build` → `node dist/index.js` (not `tsx`). If health returns 502, open Railway **Deploy Logs** — the usual causes are wrong Root Directory, missing `MONGODB_URI`, or the process crashing before listen.
+
+On the frontend host (e.g. Vercel):
+
+```env
+NEXT_PUBLIC_API_URL=https://YOUR-SERVICE.up.railway.app
+```
 
 ---
 

@@ -1,0 +1,12 @@
+# Set this service Root Directory to `server` in Railway
+# (Settings → Root Directory → server)
+
+[build]
+builder = "NIXPACKS"
+buildCommand = "npm install && npm run build"
+
+[deploy]
+startCommand = "npm start"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 30
+restartPolicyType = "ON_FAILURE"
