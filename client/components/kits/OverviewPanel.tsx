@@ -1,6 +1,8 @@
 "use client";
 
+import { ClipboardList, Clock, Layers, MessageCircleQuestion } from "lucide-react";
 import type { InterviewKit, Requirement } from "@/types/kit";
+import { StatMetrics } from "@/components/ui/StatMetrics";
 
 export function OverviewPanel({
   kit,
@@ -14,13 +16,34 @@ export function OverviewPanel({
 
   return (
     <div className="space-y-10 ui-fade-up">
-      <p className="text-sm leading-relaxed text-[var(--muted)]">
-        <span className="font-semibold text-[var(--ink)]">{kit.role.requirements.length}</span>{" "}
-        requirements ·{" "}
-        <span className="font-semibold text-[var(--ink)]">{kit.questions.length}</span> questions ·{" "}
-        <span className="font-semibold text-[var(--ink)]">{kit.flashcards.length}</span> flashcards ·{" "}
-        <span className="font-semibold text-[var(--ink)]">{totalMinutes}</span> study minutes
-      </p>
+      <StatMetrics
+        items={[
+          {
+            key: "requirements",
+            label: "Requirements",
+            value: kit.role.requirements.length,
+            icon: ClipboardList,
+          },
+          {
+            key: "questions",
+            label: "Questions",
+            value: kit.questions.length,
+            icon: MessageCircleQuestion,
+          },
+          {
+            key: "flashcards",
+            label: "Flashcards",
+            value: kit.flashcards.length,
+            icon: Layers,
+          },
+          {
+            key: "minutes",
+            label: "Study minutes",
+            value: totalMinutes,
+            icon: Clock,
+          },
+        ]}
+      />
 
       <section>
         <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">

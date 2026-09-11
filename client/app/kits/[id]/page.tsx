@@ -100,7 +100,6 @@ function KitDetailInner() {
             key={detail.id}
             kitId={detail.id}
             initialKit={detail.kit}
-            practiceHref={`/practice/${detail.id}`}
             onSaved={(kit: InterviewKit) => setDetail((prev) => (prev ? { ...prev, kit } : prev))}
           />
         </div>

@@ -98,10 +98,7 @@ function DashboardInner() {
             your profile.
           </p>
         </div>
-        <Link href="/kits/new" className="ui-btn ui-btn-primary">
-          <IconPlus size={16} />
-          Create kit
-        </Link>
+        
       </div>
 
       {kits.length > 0 ? (
@@ -201,10 +198,10 @@ function DashboardInner() {
                     </Link>
                     {canOpen && !isRunning ? (
                       <Link
-                        href={`/kits/${kit.id}`}
+                        href={`/practice/${kit.id}`}
                         className="ui-icon-btn"
-                        title="Kit details"
-                        aria-label="Kit details"
+                        title="Practice"
+                        aria-label="Practice"
                       >
                         <IconFileText />
                       </Link>

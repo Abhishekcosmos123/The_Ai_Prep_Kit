@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { Question, Requirement } from "@/types/kit";
-import { IconDown, IconEdit, IconPin, IconTrash } from "@/components/ui/Icons";
+import { IconDown, IconEdit, IconPin, IconRefresh, IconTrash } from "@/components/ui/Icons";
 import { QuestionEditorModal, type QuestionDraft } from "@/components/kits/QuestionEditorModal";
 import { useLongPressReorder } from "@/hooks/useLongPressReorder";
 import { byId, reorderList } from "@/lib/kitOrder";
@@ -40,6 +40,11 @@ export function QuestionsPanel({
     onReorder: (from, to) => {
       onChangeQuestions(reorderList(questions, from, to));
     },
+    onTap: (index) => {
+      const id = questions[index]?.id;
+      if (!id) return;
+      setExpandedQ((prev) => (prev === id ? null : id));
+    },
   });
 
   function patchQuestion(id: string, patch: Partial<Question>) {
@@ -75,7 +80,7 @@ export function QuestionsPanel({
         <div>
           <h2 className="font-display text-xl font-bold">Question bank</h2>
           <p className="text-sm text-[var(--muted)]">
-            Long-press anywhere on a card, then drag to reorder. Expand for details.
+            Click a card to expand. Long-press, then drag to reorder.
           </p>
         </div>
         <button
@@ -88,19 +93,30 @@ export function QuestionsPanel({
       </div>
 
       {categories.length > 1 ? (
-        <div className="flex flex-wrap items-center gap-2 text-sm text-[var(--muted)]">
-          <span className="text-xs font-bold uppercase tracking-[0.12em]">Regen</span>
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              disabled={!!busy}
-              className="underline-offset-2 hover:text-[var(--ink)] hover:underline disabled:opacity-50"
-              onClick={() => onRegenCategory(cat)}
-            >
-              {busy === `questions:${cat}` ? "…" : cat}
-            </button>
-          ))}
+        <div className="regen-row">
+          <span className="regen-label">
+            <IconRefresh size={14} />
+            Regen category
+          </span>
+          <div className="regen-tags">
+            {categories.map((cat) => {
+              const running = busy === `questions:${cat}`;
+              return (
+                <button
+                  key={cat}
+                  type="button"
+                  disabled={!!busy}
+                  className={`regen-tag ${running ? "is-running" : ""}`}
+                  onClick={() => onRegenCategory(cat)}
+                  title={`Regenerate all ${cat} questions`}
+                  aria-label={`Regenerate ${cat} questions`}
+                >
+                  <IconRefresh size={12} />
+                  <span>{running ? "Working…" : cat}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       ) : null}
 
@@ -210,6 +226,7 @@ export function QuestionsPanel({
           mode={modal.mode}
           initial={modal.mode === "edit" ? modal.question : null}
           requirements={requirements}
+          categories={categories}
           onClose={() => setModal(null)}
           onSave={saveDraft}
         />

@@ -1,11 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { api } from "@/lib/api";
 import type { Flashcard, InterviewKit, Question } from "@/types/kit";
 import { Field, TextInput } from "@/components/ui/primitives";
-import { IconEdit } from "@/components/ui/Icons";
+import { IconEdit, IconRefresh, IconSave } from "@/components/ui/Icons";
 import { BriefPanel } from "@/components/kits/BriefPanel";
 import { FlashcardsPanel } from "@/components/kits/FlashcardsPanel";
 import { KitTabs, type KitTabId } from "@/components/kits/KitTabs";
@@ -47,12 +46,10 @@ export function KitBuilder({
   kitId,
   initialKit,
   onSaved,
-  practiceHref,
 }: {
   kitId: string;
   initialKit: InterviewKit;
   onSaved?: (kit: InterviewKit) => void;
-  practiceHref?: string;
 }) {
   const [kit, setKit] = useState(() => withResolvedMeta(initialKit));
   const [dirty, setDirty] = useState(() => isPlaceholderMeta(initialKit.source.company));
@@ -176,156 +173,154 @@ export function KitBuilder({
   return (
     <div className="space-y-6">
       <header className="kit-toolbar border-b border-[var(--line)] pb-5">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="min-w-0 flex-1">
-            {editingMeta ? (
-              <div className="max-w-2xl space-y-3">
-                <Field label="Company">
-                  <TextInput
-                    value={kit.source.company}
-                    onChange={(e) =>
-                      update({
-                        ...kit,
-                        source: { ...kit.source, company: e.target.value },
-                      })
-                    }
-                    className="!text-xl !font-bold font-display"
-                  />
-                </Field>
-                <div className="grid gap-2 sm:grid-cols-3">
-                  <Field label="Role">
-                    <TextInput
-                      value={kit.role.title}
-                      onChange={(e) =>
-                        update({
-                          ...kit,
-                          role: { ...kit.role, title: e.target.value },
-                          source: { ...kit.source, role: e.target.value },
-                        })
-                      }
-                    />
-                  </Field>
-                  <Field label="Seniority">
-                    <TextInput
-                      value={kit.role.seniority}
-                      placeholder="e.g. Senior"
-                      onChange={(e) =>
-                        update({ ...kit, role: { ...kit.role, seniority: e.target.value } })
-                      }
-                    />
-                  </Field>
-                  <Field label="Location">
-                    <TextInput
-                      value={kit.source.location}
-                      onChange={(e) =>
-                        update({
-                          ...kit,
-                          source: { ...kit.source, location: e.target.value },
-                        })
-                      }
-                    />
-                  </Field>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    className="ui-btn ui-btn-primary !text-sm"
-                    disabled={saving || !dirty}
-                    onClick={() => {
-                      void (async () => {
-                        const ok = await save();
-                        if (ok) setEditingMeta(false);
-                      })();
-                    }}
-                  >
-                    {saving ? "Saving…" : "Save details"}
-                  </button>
-                  <button
-                    type="button"
-                    className="ui-btn ui-btn-ghost !text-sm"
-                    onClick={() => setEditingMeta(false)}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div>
-                <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-                  {kit.source.company || "Untitled kit"}
-                </h1>
-                {metaLine ? (
-                  <p className="mt-1 max-w-2xl text-sm text-[var(--muted)]">{metaLine}</p>
-                ) : null}
-                {dirty ? (
-                  <p className="mt-2 text-sm font-medium text-[var(--warn)]">Unsaved changes</p>
-                ) : null}
-              </div>
-            )}
-          </div>
-
-          {!editingMeta ? (
-            <div className="relative flex flex-wrap items-center gap-2">
-              {practiceHref ? (
-                <Link href={practiceHref} className="ui-btn ui-btn-secondary !text-sm">
-                  Practice
-                </Link>
-              ) : null}
+        {!editingMeta ? (
+          <div className="kit-toolbar-actions">
+            <div className="relative">
               <button
                 type="button"
                 className="ui-icon-btn"
-                title="Edit company & role"
-                aria-label="Edit company and role"
-                onClick={() => setEditingMeta(true)}
+                disabled={!!busy}
+                aria-expanded={regenOpen}
+                title={busy ? "Working…" : "Regenerate"}
+                aria-label={busy ? "Working" : "Regenerate"}
+                onClick={() => setRegenOpen((v) => !v)}
               >
-                <IconEdit />
+                <IconRefresh className={busy ? "animate-spin" : undefined} />
               </button>
-              <div className="relative">
+              {regenOpen ? (
+                <div className="absolute right-0 z-30 mt-2 min-w-[12rem] overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--surface)] py-1 shadow-[var(--shadow)]">
+                  {(
+                    [
+                      ["company-brief", "Company brief"],
+                      ["questions", "Questions"],
+                      ["schedule", "Schedule"],
+                    ] as const
+                  ).map(([kind, label]) => (
+                    <button
+                      key={kind}
+                      type="button"
+                      disabled={!!busy}
+                      className="block w-full px-3 py-2 text-left text-sm hover:bg-[var(--wash)] disabled:opacity-50"
+                      title={REGEN[kind]}
+                      onClick={() => {
+                        setRegenOpen(false);
+                        void regenerate(kind);
+                      }}
+                    >
+                      {busy === kind ? "Working…" : label}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+            {dirty ? (
+              <button
+                type="button"
+                disabled={saving}
+                className="ui-btn ui-btn-primary !text-sm inline-flex items-center gap-2"
+                onClick={() => void save()}
+              >
+                <IconSave size={16} />
+                {saving ? "Saving…" : "Save"}
+              </button>
+            ) : null}
+            <button
+              type="button"
+              className="ui-icon-btn"
+              title="Edit company & role"
+              aria-label="Edit company and role"
+              onClick={() => setEditingMeta(true)}
+            >
+              <IconEdit />
+            </button>
+          </div>
+        ) : null}
+
+        <div className={`min-w-0 ${editingMeta ? "" : dirty ? "kit-toolbar-main is-dirty" : "kit-toolbar-main"}`}>
+          {editingMeta ? (
+            <div className="max-w-2xl space-y-3">
+              <Field label="Company">
+                <TextInput
+                  value={kit.source.company}
+                  onChange={(e) =>
+                    update({
+                      ...kit,
+                      source: { ...kit.source, company: e.target.value },
+                    })
+                  }
+                  className="!text-xl !font-bold font-display"
+                />
+              </Field>
+              <div className="grid gap-2 sm:grid-cols-3">
+                <Field label="Role">
+                  <TextInput
+                    value={kit.role.title}
+                    onChange={(e) =>
+                      update({
+                        ...kit,
+                        role: { ...kit.role, title: e.target.value },
+                        source: { ...kit.source, role: e.target.value },
+                      })
+                    }
+                  />
+                </Field>
+                <Field label="Seniority">
+                  <TextInput
+                    value={kit.role.seniority}
+                    placeholder="e.g. Senior"
+                    onChange={(e) =>
+                      update({ ...kit, role: { ...kit.role, seniority: e.target.value } })
+                    }
+                  />
+                </Field>
+                <Field label="Location">
+                  <TextInput
+                    value={kit.source.location}
+                    onChange={(e) =>
+                      update({
+                        ...kit,
+                        source: { ...kit.source, location: e.target.value },
+                      })
+                    }
+                  />
+                </Field>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  className="ui-btn ui-btn-primary !text-sm"
+                  disabled={saving || !dirty}
+                  onClick={() => {
+                    void (async () => {
+                      const ok = await save();
+                      if (ok) setEditingMeta(false);
+                    })();
+                  }}
+                >
+                  {saving ? "Saving…" : "Save details"}
+                </button>
                 <button
                   type="button"
                   className="ui-btn ui-btn-ghost !text-sm"
-                  disabled={!!busy}
-                  aria-expanded={regenOpen}
-                  onClick={() => setRegenOpen((v) => !v)}
+                  onClick={() => setEditingMeta(false)}
                 >
-                  {busy ? "Working…" : "Regenerate"}
+                  Cancel
                 </button>
-                {regenOpen ? (
-                  <div className="absolute right-0 z-30 mt-2 min-w-[12rem] overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--surface)] py-1 shadow-[var(--shadow)]">
-                    {(
-                      [
-                        ["company-brief", "Company brief"],
-                        ["questions", "Questions"],
-                        ["schedule", "Schedule"],
-                      ] as const
-                    ).map(([kind, label]) => (
-                      <button
-                        key={kind}
-                        type="button"
-                        disabled={!!busy}
-                        className="block w-full px-3 py-2 text-left text-sm hover:bg-[var(--wash)] disabled:opacity-50"
-                        title={REGEN[kind]}
-                        onClick={() => {
-                          setRegenOpen(false);
-                          void regenerate(kind);
-                        }}
-                      >
-                        {busy === kind ? "Working…" : label}
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
               </div>
-              <button
-                type="button"
-                disabled={saving || !dirty}
-                className="ui-btn ui-btn-primary !text-sm"
-                onClick={() => void save()}
-              >
-                {saving ? "Saving…" : "Save"}
-              </button>
             </div>
-          ) : null}
+          ) : (
+            <div>
+              <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
+                {kit.source.company || "Untitled kit"}
+              </h1>
+              {metaLine ? (
+                <p className="mt-1 max-w-2xl text-sm text-[var(--muted)]">{metaLine}</p>
+              ) : null}
+              {dirty ? (
+                <p className="mt-2 text-sm font-medium text-[var(--warn)]">Unsaved changes</p>
+              ) : null}
+            </div>
+          )}
         </div>
         {message ? (
           <p className="mt-3 text-sm text-[var(--muted)]" role="status">

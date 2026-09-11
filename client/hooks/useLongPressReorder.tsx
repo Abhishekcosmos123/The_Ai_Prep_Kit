@@ -15,6 +15,8 @@ type ReorderItem = { id: string; label: string };
 type Options = {
   items: ReorderItem[];
   onReorder: (from: number, to: number) => void;
+  /** Fires on a short press that did not become a drag. */
+  onTap?: (index: number) => void;
   /** CSS selectors used to measure ghost width / left (first match wins). */
   widthSelectors?: string[];
   itemAttr?: string;
@@ -25,11 +27,13 @@ type Options = {
 
 /**
  * Long-press anywhere on a row, then drag to reorder.
+ * Short press (tap) calls onTap when provided.
  * Renders a full-width floating ghost via portal.
  */
 export function useLongPressReorder({
   items,
   onReorder,
+  onTap,
   widthSelectors = [".kit-tabs", ".q-list"],
   itemAttr = "data-q-index",
   pressMs = 320,
@@ -54,6 +58,8 @@ export function useLongPressReorder({
   itemsRef.current = items;
   const onReorderRef = useRef(onReorder);
   onReorderRef.current = onReorder;
+  const onTapRef = useRef(onTap);
+  onTapRef.current = onTap;
 
   const stopAutoScroll = useCallback(() => {
     if (autoScrollRef.current != null) {
@@ -239,14 +245,16 @@ export function useLongPressReorder({
         }
       },
       onPointerUp: () => {
-        if (!dragActiveRef.current) {
-          if (pressTimerRef.current) {
-            clearTimeout(pressTimerRef.current);
-            pressTimerRef.current = null;
-          }
+        if (dragActiveRef.current) {
+          finish();
           return;
         }
-        finish();
+        const wasPendingPress = pressTimerRef.current != null;
+        if (pressTimerRef.current) {
+          clearTimeout(pressTimerRef.current);
+          pressTimerRef.current = null;
+        }
+        if (wasPendingPress) onTapRef.current?.(index);
       },
       onPointerCancel: () => finish(),
     };

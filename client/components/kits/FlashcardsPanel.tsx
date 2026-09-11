@@ -1,10 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import type { Flashcard, Requirement } from "@/types/kit";
 import { IconEdit, IconTrash } from "@/components/ui/Icons";
 import { FlashcardEditorModal, type FlashcardDraft } from "@/components/kits/FlashcardEditorModal";
-import { byId } from "@/lib/kitOrder";
 
 export function FlashcardsPanel({
   flashcards,
@@ -19,7 +18,6 @@ export function FlashcardsPanel({
   const [modal, setModal] = useState<null | { mode: "add" } | { mode: "edit"; card: Flashcard }>(
     null
   );
-  const reqById = useMemo(() => byId(requirements), [requirements]);
 
   function saveDraft(draft: FlashcardDraft) {
     if (modal?.mode === "edit") {
@@ -59,11 +57,6 @@ export function FlashcardsPanel({
       <div className="flash-grid">
         {flashcards.map((f) => {
           const showBack = !!flipped[f.id];
-          const covers = f.requirement_ids
-            .map((id) => reqById.get(id)?.text)
-            .filter(Boolean)
-            .slice(0, 1)
-            .join("");
           return (
             <article key={f.id} className="flash-card">
               <div className="flash-card-toolbar">
@@ -94,14 +87,24 @@ export function FlashcardsPanel({
               </div>
               <button
                 type="button"
-                className={`flash-face ${showBack ? "is-back" : ""}`}
+                className={`flash-flip ${showBack ? "is-flipped" : ""}`}
+                aria-pressed={showBack}
+                aria-label={showBack ? "Show front of card" : "Show back of card"}
                 onClick={() => setFlipped((prev) => ({ ...prev, [f.id]: !prev[f.id] }))}
               >
-                <span className="flash-face-label">{showBack ? "Back" : "Front"}</span>
-                <p className="flash-face-text">{showBack ? f.back : f.front}</p>
-                <span className="flash-face-hint">Click to flip</span>
+                <span className="flash-flip-inner">
+                  <span className="flash-face flash-face-front">
+                    <span className="flash-face-label">Front</span>
+                    <span className="flash-face-text">{f.front}</span>
+                    <span className="flash-face-hint">Click to flip</span>
+                  </span>
+                  <span className="flash-face flash-face-back">
+                    <span className="flash-face-label">Back</span>
+                    <span className="flash-face-text">{f.back}</span>
+                    <span className="flash-face-hint">Click to flip</span>
+                  </span>
+                </span>
               </button>
-              {covers ? <p className="flash-covers">Covers · {covers}</p> : null}
             </article>
           );
         })}

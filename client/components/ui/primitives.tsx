@@ -1,5 +1,6 @@
 import type { InputHTMLAttributes, ReactNode, TextareaHTMLAttributes } from "react";
 import Link from "next/link";
+import { PageLoading } from "@/components/ui/PageLoading";
 
 export function statusBadgeClass(status: string) {
   if (status === "completed") return "ui-badge ui-badge-ok";
@@ -25,12 +26,7 @@ export function coverageTone(pct: number | null | undefined): "ok" | "warn" | "n
 }
 
 export function LoadingBlock({ label = "Loading…" }: { label?: string }) {
-  return (
-    <div className="ui-page flex items-center gap-3 text-[var(--muted)]">
-      <span className="inline-block h-2.5 w-2.5 rounded-full bg-[var(--accent)] ui-pulse" />
-      {label}
-    </div>
-  );
+  return <PageLoading label={label} />;
 }
 
 export function Alert({
@@ -126,23 +122,28 @@ export function Stat({ label, value, tone }: { label: string; value: ReactNode; 
 export function Field({
   label,
   hint,
+  badge,
   children,
   className = "",
   htmlFor,
 }: {
   label: string;
-  hint?: string;
+  hint?: ReactNode;
+  badge?: ReactNode;
   children: ReactNode;
   className?: string;
   htmlFor?: string;
 }) {
   return (
     <div className={className}>
-      <label className="ui-label" htmlFor={htmlFor}>
-        {label}
-      </label>
-      <div className="mt-1.5">{children}</div>
-      {hint ? <p className="ui-help">{hint}</p> : null}
+      <div className="mb-1.5 flex flex-wrap items-center gap-2">
+        <label className="ui-label !mb-0" htmlFor={htmlFor}>
+          {label}
+        </label>
+        {badge}
+      </div>
+      {children}
+      {hint ? <div className="ui-help">{hint}</div> : null}
     </div>
   );
 }

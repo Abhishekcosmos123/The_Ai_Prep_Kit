@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { IconClose } from "@/components/ui/Icons";
 
 export function ModalShell({
@@ -24,11 +25,18 @@ export function ModalShell({
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKey);
+    };
   }, [onClose]);
 
-  return (
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <div
       className="ui-modal-backdrop"
       role="presentation"
@@ -42,7 +50,7 @@ export function ModalShell({
         aria-modal="true"
         aria-labelledby={titleId}
       >
-        <div className="flex items-start justify-between gap-3">
+        <div className="ui-modal-header">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-[var(--accent)]">
               {eyebrow}
@@ -61,9 +69,10 @@ export function ModalShell({
             <IconClose />
           </button>
         </div>
-        {children}
-        {footer}
+        <div className="ui-modal-body">{children}</div>
+        {footer ? <div className="ui-modal-footer">{footer}</div> : null}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
