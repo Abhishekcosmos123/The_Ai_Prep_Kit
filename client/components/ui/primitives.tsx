@@ -1,52 +1,46 @@
-import type { ReactNode } from "react";
+import type { InputHTMLAttributes, ReactNode, TextareaHTMLAttributes } from "react";
+import Link from "next/link";
 
-export function statusBadgeClass(status: string): string {
-  switch (status) {
-    case "completed":
-      return "ui-badge ui-badge-ok";
-    case "incomplete":
-      return "ui-badge ui-badge-warn";
-    case "failed":
-      return "ui-badge ui-badge-warn";
-    case "queued":
-    case "running":
-      return "ui-badge ui-badge-info";
-    default:
-      return "ui-badge ui-badge-neutral";
-  }
+export function statusBadgeClass(status: string) {
+  if (status === "completed") return "ui-badge ui-badge-ok";
+  if (status === "incomplete" || status === "failed") return "ui-badge ui-badge-warn";
+  if (status === "queued" || status === "running") return "ui-badge ui-badge-info";
+  return "ui-badge ui-badge-neutral";
 }
 
-export function statusLabel(status: string): string {
-  switch (status) {
-    case "queued":
-      return "Queued";
-    case "running":
-      return "Generating";
-    case "completed":
-      return "Ready";
-    case "incomplete":
-      return "Incomplete";
-    case "failed":
-      return "Failed";
-    default:
-      return status;
-  }
+export function statusLabel(status: string) {
+  const map: Record<string, string> = {
+    queued: "Queued",
+    running: "Generating",
+    completed: "Ready",
+    incomplete: "Incomplete",
+    failed: "Failed",
+  };
+  return map[status] || status;
 }
 
 export function coverageTone(pct: number | null | undefined): "ok" | "warn" | "neutral" {
   if (pct == null) return "neutral";
-  if (pct >= 90) return "ok";
-  if (pct >= 60) return "warn";
-  return "warn";
+  return pct >= 90 ? "ok" : "warn";
 }
 
 export function LoadingBlock({ label = "Loading…" }: { label?: string }) {
   return (
     <div className="ui-page flex items-center gap-3 text-[var(--muted)]">
       <span className="inline-block h-2.5 w-2.5 rounded-full bg-[var(--accent)] ui-pulse" />
-      <span>{label}</span>
+      {label}
     </div>
   );
+}
+
+export function Alert({
+  children,
+  tone = "warn",
+}: {
+  children: ReactNode;
+  tone?: "warn" | "ok";
+}) {
+  return <div className={`ui-alert ui-alert-${tone}`}>{children}</div>;
 }
 
 export function EmptyState({
@@ -60,17 +54,7 @@ export function EmptyState({
 }) {
   return (
     <div className="ui-panel px-8 py-12 text-center">
-      <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--accent-soft)] text-[var(--accent)]">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
-          <path
-            d="M7 4h7l5 5v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"
-            stroke="currentColor"
-            strokeWidth="1.6"
-          />
-          <path d="M14 4v5h5" stroke="currentColor" strokeWidth="1.6" />
-        </svg>
-      </div>
-      <h2 className="font-[family-name:var(--font-display)] text-xl text-[var(--ink)]">{title}</h2>
+      <h2 className="font-display text-xl">{title}</h2>
       <p className="mx-auto mt-2 max-w-md text-sm text-[var(--muted)]">{body}</p>
       {action ? <div className="mt-6 flex justify-center">{action}</div> : null}
     </div>
@@ -79,23 +63,24 @@ export function EmptyState({
 
 export function CoverageMeter({
   value,
-  label,
+  label = "Coverage",
 }: {
   value: number | null | undefined;
   label?: string;
 }) {
   const pct = value == null ? null : Math.round(value * (value <= 1 ? 100 : 1));
   const tone = coverageTone(pct);
-  const meterClass =
-    tone === "ok" ? "ui-meter ui-meter-ok" : tone === "warn" ? "ui-meter ui-meter-warn" : "ui-meter";
-
   return (
     <div className="min-w-[7rem]">
-      <div className="mb-1 flex items-center justify-between gap-2 text-xs text-[var(--muted)]">
-        <span>{label || "Coverage"}</span>
+      <div className="mb-1 flex justify-between gap-2 text-xs text-[var(--muted)]">
+        <span>{label}</span>
         <span className="font-semibold text-[var(--ink)]">{pct == null ? "—" : `${pct}%`}</span>
       </div>
-      <div className={meterClass}>
+      <div
+        className={
+          tone === "ok" ? "ui-meter ui-meter-ok" : tone === "warn" ? "ui-meter ui-meter-warn" : "ui-meter"
+        }
+      >
         <span style={{ width: `${pct ?? 0}%` }} />
       </div>
     </div>
@@ -117,16 +102,74 @@ export function PageHeader({
     <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
       <div className="max-w-2xl">
         {eyebrow ? (
-          <p className="mb-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">
+          <p className="mb-1 text-xs font-bold uppercase tracking-[0.16em] text-[var(--accent)]">
             {eyebrow}
           </p>
         ) : null}
-        <h1 className="font-[family-name:var(--font-display)] text-3xl tracking-tight text-[var(--ink)] sm:text-4xl">
-          {title}
-        </h1>
+        <h1 className="font-display text-3xl font-bold tracking-tight sm:text-[2.35rem]">{title}</h1>
         {description ? <p className="mt-2 text-[var(--muted)]">{description}</p> : null}
       </div>
-      {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
+      {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
+    </div>
+  );
+}
+
+export function Stat({ label, value, tone }: { label: string; value: ReactNode; tone?: string }) {
+  return (
+    <div className="ui-panel px-4 py-3">
+      <p className="text-xs font-bold uppercase tracking-wide text-[var(--muted)]">{label}</p>
+      <p className={`mt-1 text-2xl font-semibold tabular-nums ${tone || ""}`}>{value}</p>
+    </div>
+  );
+}
+
+export function Field({
+  label,
+  hint,
+  children,
+  className = "",
+  htmlFor,
+}: {
+  label: string;
+  hint?: string;
+  children: ReactNode;
+  className?: string;
+  htmlFor?: string;
+}) {
+  return (
+    <div className={className}>
+      <label className="ui-label" htmlFor={htmlFor}>
+        {label}
+      </label>
+      <div className="mt-1.5">{children}</div>
+      {hint ? <p className="ui-help">{hint}</p> : null}
+    </div>
+  );
+}
+
+export function TextInput({ className = "", ...props }: InputHTMLAttributes<HTMLInputElement>) {
+  return <input className={`ui-input ${className}`.trim()} {...props} />;
+}
+
+export function TextArea({ className = "", ...props }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  return <textarea className={`ui-textarea ${className}`.trim()} {...props} />;
+}
+
+export function BackLink({ href, label }: { href: string; label: string }) {
+  return (
+    <Link href={href} className="ui-btn ui-btn-ghost !px-2">
+      ← {label}
+    </Link>
+  );
+}
+
+export function ErrorBox({ message, href = "/dashboard", hrefLabel = "Back" }: { message: string; href?: string; hrefLabel?: string }) {
+  return (
+    <div className="ui-page">
+      <Alert>{message}</Alert>
+      <Link href={href} className="ui-btn ui-btn-secondary mt-4">
+        {hrefLabel}
+      </Link>
     </div>
   );
 }

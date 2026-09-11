@@ -3,115 +3,81 @@
 import Link from "next/link";
 import { useAuth } from "@/components/auth/AuthProvider";
 
-const STEPS = [
-  {
-    n: "01",
-    title: "Paste the role",
-    body: "Drop in the job description and company site. We extract must-have requirements from the JD itself.",
-  },
-  {
-    n: "02",
-    title: "Research & generate",
-    body: "Company brief, interview questions, and flashcards are built in separate pipeline steps — not one giant prompt.",
-  },
-  {
-    n: "03",
-    title: "Study on a plan",
-    body: "Coverage is checked in code, then a day-by-day schedule is allocated so you know what to practice next.",
-  },
-];
+function HeroArt() {
+  return (
+    <svg viewBox="0 0 520 420" className="h-full w-full" aria-hidden>
+      <defs>
+        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#0f6b4c" stopOpacity="0.9" />
+          <stop offset="100%" stopColor="#1e3a5f" stopOpacity="0.55" />
+        </linearGradient>
+      </defs>
+      <rect x="40" y="48" width="360" height="320" rx="18" fill="#f7f9f8" stroke="#d5ddd8" />
+      <path className="ui-draw" d="M78 118h280" stroke="url(#g)" strokeWidth="10" strokeLinecap="round" />
+      <path className="ui-draw" style={{ animationDelay: "0.15s" }} d="M78 168h210" stroke="#b7c4bc" strokeWidth="8" strokeLinecap="round" />
+      <path className="ui-draw" style={{ animationDelay: "0.3s" }} d="M78 218h250" stroke="#b7c4bc" strokeWidth="8" strokeLinecap="round" />
+      <rect x="78" y="258" width="120" height="72" rx="12" fill="#d8f0e6" />
+      <rect x="214" y="258" width="120" height="72" rx="12" fill="#e2eaf4" />
+      <circle cx="420" cy="120" r="54" fill="#0f6b4c" opacity="0.9" />
+      <path d="M400 120h40M420 100v40" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
+      <text x="78" y="98" fill="#5c6b64" fontSize="14" fontFamily="system-ui">Day plan</text>
+    </svg>
+  );
+}
 
 export default function HomePage() {
   const { user, loading } = useAuth();
-  const primaryHref = !loading && user ? "/dashboard" : "/register";
-  const primaryLabel = !loading && user ? "Open my kits" : "Get started free";
-  const secondaryHref = !loading && user ? "/kits/new" : "/login";
-  const secondaryLabel = !loading && user ? "Create a kit" : "Log in";
+  const inApp = !loading && !!user;
 
   return (
-    <div className="mx-auto max-w-6xl px-4 pb-20 pt-10 sm:pt-14">
-      <section className="relative overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-6 py-14 shadow-[var(--shadow-md)] sm:px-12 sm:py-16 ui-fade-up">
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            backgroundImage:
-              "radial-gradient(ellipse 70% 80% at 100% 0%, rgba(15,118,110,0.14), transparent 55%), linear-gradient(135deg, rgba(15,23,42,0.03), transparent 40%)",
-          }}
-        />
-        <div
-          className="pointer-events-none absolute -right-8 bottom-0 h-56 w-56 rounded-full opacity-30 sm:h-72 sm:w-72"
-          style={{
-            background:
-              "conic-gradient(from 180deg at 50% 50%, rgba(15,118,110,0.35), transparent 55%, rgba(29,78,216,0.2))",
-            filter: "blur(2px)",
-          }}
-        />
-        <div className="relative max-w-2xl">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--accent)]">
-            Interview preparation
-          </p>
-          <h1 className="font-[family-name:var(--font-display)] text-4xl leading-[1.1] tracking-tight text-[var(--ink)] sm:text-5xl lg:text-6xl">
-            The AI Prep Kit
-          </h1>
-          <p className="mt-5 max-w-xl text-lg leading-relaxed text-[var(--muted)]">
-            Turn a job description into a researched company brief, coverage-checked questions,
-            flashcards, and a day-by-day study schedule.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href={primaryHref} className="ui-btn ui-btn-primary !px-5 !py-2.5">
-              {primaryLabel}
-            </Link>
-            <Link href={secondaryHref} className="ui-btn ui-btn-secondary !px-5 !py-2.5">
-              {secondaryLabel}
-            </Link>
+    <div>
+      <section className="relative overflow-hidden border-b border-[var(--line)]">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-16 pt-12 sm:pt-16 lg:grid-cols-[1.05fr_0.95fr] lg:pb-20">
+          <div className="ui-fade-up">
+            <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-[var(--accent)]">
+              The AI Prep Kit
+            </p>
+            <h1 className="font-display max-w-xl text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
+              Prep that starts from the posting — not a generic quiz bank.
+            </h1>
+            <p className="mt-5 max-w-lg text-lg leading-relaxed text-[var(--muted)]">
+              Paste a job description and company URL. Get a researched brief, coverage-checked
+              questions, flashcards, and a day-by-day schedule.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href={inApp ? "/dashboard" : "/register"} className="ui-btn ui-btn-primary !px-5 !py-2.5">
+                {inApp ? "Open my kits" : "Get started free"}
+              </Link>
+              <Link href={inApp ? "/kits/new" : "/login"} className="ui-btn ui-btn-secondary !px-5 !py-2.5">
+                {inApp ? "Create a kit" : "Log in"}
+              </Link>
+            </div>
+          </div>
+          <div className="relative ui-fade-up" style={{ animationDelay: "90ms" }}>
+            <div className="absolute -inset-6 -z-10 rounded-[2rem] bg-[radial-gradient(circle_at_70%_30%,rgba(15,107,76,0.18),transparent_60%)]" />
+            <HeroArt />
           </div>
         </div>
       </section>
 
-      <section className="mt-14 ui-fade-up" style={{ animationDelay: "80ms" }}>
-        <div className="mb-6 max-w-xl">
-          <h2 className="font-[family-name:var(--font-display)] text-2xl text-[var(--ink)]">
-            How it works
-          </h2>
-          <p className="mt-2 text-[var(--muted)]">
-            Built like a study plan product — clear steps, visible coverage, and practice you can
-            reopen until the interview.
-          </p>
-        </div>
-        <ol className="grid gap-4 md:grid-cols-3">
-          {STEPS.map((step) => (
-            <li key={step.n} className="ui-panel p-5">
-              <span className="text-xs font-bold tracking-widest text-[var(--accent)]">{step.n}</span>
-              <h3 className="mt-2 font-[family-name:var(--font-display)] text-xl">{step.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">{step.body}</p>
+      <section className="mx-auto max-w-6xl px-4 py-14 ui-fade-up" style={{ animationDelay: "140ms" }}>
+        <h2 className="font-display text-2xl font-bold tracking-tight">Three deliberate steps</h2>
+        <p className="mt-2 max-w-xl text-[var(--muted)]">
+          Research, generation, and scheduling stay separate — coverage is checked in code, not guessed by the model.
+        </p>
+        <ol className="mt-8 grid gap-8 md:grid-cols-3">
+          {[
+            ["Paste the role", "JD + company site. Must-haves come from the posting itself."],
+            ["Watch the pipeline", "Crawl, brief, category questions, gap-fill, flashcards."],
+            ["Study the plan", "Edit freely, regenerate sections, practice by confidence."],
+          ].map(([title, body], i) => (
+            <li key={title} className="border-t border-[var(--line-strong)] pt-4">
+              <span className="text-xs font-bold tracking-[0.14em] text-[var(--accent)]">0{i + 1}</span>
+              <h3 className="mt-2 font-display text-xl font-bold">{title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">{body}</p>
             </li>
           ))}
         </ol>
-      </section>
-
-      <section
-        className="mt-10 grid gap-4 sm:grid-cols-3 ui-fade-up"
-        style={{ animationDelay: "140ms" }}
-      >
-        {[
-          {
-            title: "Separate pipeline steps",
-            body: "Research, extraction, generation, coverage, and scheduling stay distinct and inspectable.",
-          },
-          {
-            title: "Deterministic engines",
-            body: "Coverage checks and day allocation run in application code — explainable and testable.",
-          },
-          {
-            title: "Editable & practiceable",
-            body: "Pin questions, regenerate sections, and drill flashcards by confidence over time.",
-          },
-        ].map((item) => (
-          <div key={item.title} className="rounded-xl border border-transparent bg-[var(--wash)]/80 p-5">
-            <h3 className="font-semibold text-[var(--ink)]">{item.title}</h3>
-            <p className="mt-2 text-sm text-[var(--muted)]">{item.body}</p>
-          </div>
-        ))}
       </section>
     </div>
   );

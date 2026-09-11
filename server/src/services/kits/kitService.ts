@@ -14,6 +14,7 @@ import { getLLMProvider } from "../generation/llmProvider.js";
 import { ResearchService } from "../research/researchService.js";
 import { v4 as uuid } from "uuid";
 import { logger } from "../../config/logger.js";
+import { resolveCompanyName, isPlaceholderMeta } from "../../utils/metaClean.js";
 
 const INITIAL_STEPS: GenerationStep[] = [
   { id: "validate", label: "Validating input", status: "pending" },
@@ -474,10 +475,19 @@ export class KitService {
           kit.role.requirements.length
         : null;
 
+    const company = kit
+      ? resolveCompanyName({
+          extracted: kit.source.company,
+          companyUrl: kit.source.company_url || doc.input.company_url,
+        })
+      : isPlaceholderMeta(doc.input?.company_url)
+        ? "Pending"
+        : resolveCompanyName({ companyUrl: doc.input.company_url });
+
     return {
       id: doc._id.toString(),
-      company: kit?.source.company || "Pending",
-      role: kit?.role.title || "Pending",
+      company: company || "Pending",
+      role: kit?.role.title && !isPlaceholderMeta(kit.role.title) ? kit.role.title : "Pending",
       generationStatus: doc.generationStatus,
       generationPercent: doc.generationPercent,
       createdAt: (doc as unknown as { createdAt: Date }).createdAt,

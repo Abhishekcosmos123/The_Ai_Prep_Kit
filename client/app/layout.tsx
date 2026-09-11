@@ -1,28 +1,24 @@
 import type { Metadata } from "next";
-import { Fraunces, Source_Sans_3 } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { AppHeader } from "@/components/auth/AppHeader";
 import "./globals.css";
 
-const display = Fraunces({
-  variable: "--font-fraunces",
+const sans = Plus_Jakarta_Sans({
+  variable: "--font-sans-face",
   subsets: ["latin"],
-});
-
-const body = Source_Sans_3({
-  variable: "--font-source",
-  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
   title: "The AI Prep Kit",
-  description: "AI-powered interview preparation with deterministic coverage and scheduling",
+  description: "Turn a job description into a researched, coverage-checked interview prep kit.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable} h-full`}>
-      <body className="min-h-full flex flex-col antialiased">
+    <html lang="en" className={`${sans.variable} h-full`}>
+      <body className="flex min-h-full flex-col antialiased">
         <AuthProvider>
           <AppHeader />
           <main className="flex-1">{children}</main>

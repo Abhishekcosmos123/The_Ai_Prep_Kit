@@ -1,63 +1,34 @@
 "use client";
 
+import { useState } from "react";
 import type { GenerationStep } from "@/types/kit";
+import { IconCheck, IconLink } from "@/components/ui/Icons";
 
-const STEP_HINTS: Record<string, string> = {
-  validate: "Checking your JD, URL, and day count",
-  extract: "Pulling must-have and nice-to-have requirements from the JD",
-  research: "Crawling the company site and gathering interview context",
-  brief: "Writing a grounded company brief from research",
-  questions: "Drafting interview questions in separate category calls",
-  coverage: "Checking every requirement is covered in application code",
-  gaps: "Filling uncovered must-have requirements",
-  interviews: "Looking for public interview discussion",
-  flashcards: "Building practice flashcards",
-  schedule: "Allocating a day-by-day study plan",
-  validate_kit: "Validating kit structure",
-  persist: "Saving your kit",
+const HINTS: Record<string, string> = {
+  validate: "Checking JD, URL, and day count before research starts.",
+  extract: "Pulling must-have and nice-to-have requirements from the posting.",
+  research: "Crawling the company site and ranking hiring / about pages.",
+  interviews: "Searching public discussion of this company’s interview process.",
+  brief: "Writing a grounded company brief from fetched pages only.",
+  questions: "Generating questions in separate category calls.",
+  coverage: "Deterministic check: every requirement needs a linked question.",
+  gaps: "Generating questions for any still-uncovered requirements.",
+  flashcards: "Building study flashcards tied to requirement IDs.",
+  schedule: "Allocating topics across your available days in code.",
+  validate_kit: "Validating the kit structure before save.",
 };
 
-function stepHint(step: GenerationStep): string {
-  const key = Object.keys(STEP_HINTS).find((k) => step.id.toLowerCase().includes(k));
-  return key ? STEP_HINTS[key] : step.message || "";
+function stepHint(step: GenerationStep) {
+  const key = Object.keys(HINTS).find((k) => step.id.includes(k));
+  return step.message || (key ? HINTS[key] : "") || "Pipeline step";
 }
 
-function StepIcon({ status }: { status: GenerationStep["status"] }) {
-  if (status === "done") {
-    return (
-      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--ok-soft)] text-[var(--ok)]">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
-          <path d="M3.5 8.5 6.5 11.5 12.5 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-        </svg>
-      </span>
-    );
-  }
-  if (status === "running") {
-    return (
-      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--info-soft)] text-[var(--info)]">
-        <span className="h-2.5 w-2.5 rounded-full bg-current ui-pulse" />
-      </span>
-    );
-  }
-  if (status === "error") {
-    return (
-      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--warn-soft)] text-[var(--warn)] text-sm font-bold">
-        !
-      </span>
-    );
-  }
-  if (status === "skipped") {
-    return (
-      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--wash)] text-[var(--muted)] text-xs">
-        –
-      </span>
-    );
-  }
-  return (
-    <span className="flex h-7 w-7 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--surface)] text-[var(--muted)]">
-      <span className="h-1.5 w-1.5 rounded-full bg-current" />
-    </span>
-  );
+function statusCopy(status: GenerationStep["status"]) {
+  if (status === "done") return "Completed";
+  if (status === "running") return "In progress";
+  if (status === "error") return "Failed";
+  if (status === "skipped") return "Skipped";
+  return "Waiting";
 }
 
 export function GenerationProgress({
@@ -73,79 +44,168 @@ export function GenerationProgress({
   error?: { code?: string; message?: string } | null;
   companyUrl?: string;
 }) {
+  const [hoverId, setHoverId] = useState<string | null>(null);
   const running = steps.find((s) => s.status === "running");
-  const statusCopy =
+  const doneCount = steps.filter((s) => s.status === "done" || s.status === "skipped").length;
+  const stepIndex = running ? steps.findIndex((s) => s.id === running.id) + 1 : doneCount;
+  const title =
     status === "queued"
       ? "Queued — starting shortly"
       : status === "running"
-        ? "Generating your kit"
-        : status;
+        ? "Building your prep kit"
+        : status === "completed"
+          ? "Prep kit ready"
+          : status;
 
   return (
-    <div className="ui-panel overflow-hidden">
-      <div className="border-b border-[var(--line)] bg-[var(--wash)]/50 px-6 py-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">
-              Pipeline
-            </p>
-            <h2 className="mt-1 font-[family-name:var(--font-display)] text-2xl text-[var(--ink)]">
-              {statusCopy}
-            </h2>
-            <p className="mt-2 max-w-xl text-sm text-[var(--muted)]">
-              Multi-step research and generation can take a few minutes. This page updates live —
-              you can leave and come back from your dashboard.
-            </p>
-            {companyUrl ? (
-              <p className="mt-2 truncate text-xs text-[var(--muted)]">Researching {companyUrl}</p>
-            ) : null}
-          </div>
-          <div className="rounded-lg bg-[var(--surface)] px-3 py-2 text-right shadow-[var(--shadow-sm)]">
-            <p className="text-2xl font-semibold tabular-nums text-[var(--ink)]">{percent}%</p>
-            <p className="text-xs text-[var(--muted)] capitalize">{status}</p>
-          </div>
-        </div>
-        <div className="ui-meter mt-4 h-2.5">
-          <span style={{ width: `${percent}%` }} />
-        </div>
-        {running ? (
-          <p className="mt-3 text-sm font-medium text-[var(--info)]">
-            Now: {running.label}
-            {running.message ? ` — ${running.message}` : ""}
+    <section className="pipeline ui-fade-up">
+      <div className="pipeline-top">
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--accent)]">
+            Pipeline roadmap · autonomous agent
           </p>
-        ) : null}
+          <h2 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">{title}</h2>
+          <p className="mt-2 max-w-xl text-sm text-[var(--muted)]">
+            Hover any step for details. You can safely navigate away — progress is saved.
+          </p>
+          {companyUrl ? (
+            <a
+              href={companyUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="research-chip mt-4"
+            >
+              <span className="status-dot ok" />
+              <span className="truncate">Researching: {companyUrl}</span>
+              <IconLink size={14} />
+            </a>
+          ) : null}
+        </div>
+
+        <div className="pipeline-progress-card">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="font-display text-4xl font-bold tabular-nums tracking-tight">{percent}%</p>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <span className="ui-badge ui-badge-ok capitalize">{status}</span>
+              </div>
+            </div>
+            <div className="pipeline-ring" aria-hidden>
+              <svg viewBox="0 0 36 36">
+                <path
+                  d="M18 2.5a15.5 15.5 0 1 1 0 31 15.5 15.5 0 1 1 0-31"
+                  fill="none"
+                  stroke="var(--wash)"
+                  strokeWidth="3"
+                />
+                <path
+                  d="M18 2.5a15.5 15.5 0 1 1 0 31 15.5 15.5 0 1 1 0-31"
+                  fill="none"
+                  stroke="var(--accent)"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeDasharray={`${Math.max(0, Math.min(100, percent)) * 0.97}, 100`}
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <ul className="divide-y divide-[var(--line)] px-2 py-1 sm:px-4">
-        {steps.map((step) => {
-          const hint = step.message || stepHint(step);
+      <div className="pipeline-bar-wrap">
+        <div className="ui-meter ui-meter-ok h-2">
+          <span style={{ width: `${percent}%` }} />
+        </div>
+        <div className="pipeline-bar-meta">
+          <span>
+            {running ? (
+              <>
+                Now: <strong>{running.label}</strong>
+                {running.message ? ` — ${running.message}` : ""}
+              </>
+            ) : (
+              <strong className="capitalize">{status}</strong>
+            )}
+          </span>
+          <span>
+            Step {Math.min(stepIndex || 1, steps.length || 1)} of {steps.length || "—"}
+          </span>
+        </div>
+      </div>
+
+      <ol className="roadmap" aria-label="Generation steps">
+        {steps.map((step, index) => {
+          const left = index % 2 === 0;
+          const active = step.status === "running";
+          const done = step.status === "done";
+          const failed = step.status === "error";
+          const pending = step.status === "pending" || step.status === "skipped";
+          const showTip = hoverId === step.id;
           return (
-            <li key={step.id} className="flex items-start gap-3 px-2 py-3.5">
-              <StepIcon status={step.status} />
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span
-                    className={`text-sm font-medium ${
-                      step.status === "running" ? "text-[var(--ink)]" : "text-[var(--ink)]"
-                    }`}
-                  >
-                    {step.label}
-                  </span>
-                  <span className="ui-badge ui-badge-neutral !normal-case">{step.status}</span>
-                </div>
-                {hint ? <p className="mt-0.5 text-xs text-[var(--muted)]">{hint}</p> : null}
+            <li
+              key={step.id}
+              className={`roadmap-step ${left ? "roadmap-left" : "roadmap-right"} ${active ? "is-active" : ""} ${done ? "is-done" : ""} ${failed ? "is-error" : ""} ${pending && !active && !done && !failed ? "is-pending" : ""}`}
+              onMouseEnter={() => setHoverId(step.id)}
+              onMouseLeave={() => setHoverId(null)}
+              onFocus={() => setHoverId(step.id)}
+              onBlur={() => setHoverId(null)}
+              tabIndex={0}
+            >
+              <div className="roadmap-node" aria-hidden>
+                {done ? <IconCheck size={16} /> : active ? <span className="roadmap-pulse" /> : index + 1}
               </div>
+              <div className={`roadmap-card ${active ? "roadmap-card-active" : ""}`}>
+                <p className={`roadmap-pill ${done ? "ok" : active ? "run" : "wait"}`}>
+                  {statusCopy(step.status)}
+                </p>
+                <p className="roadmap-label">{step.label}</p>
+                <p className="roadmap-status">{stepHint(step)}</p>
+                {active && step.message ? (
+                  <p className="roadmap-live">{step.message}</p>
+                ) : null}
+              </div>
+              {showTip ? (
+                <div className={`roadmap-tip ${left ? "tip-right" : "tip-left"}`} role="tooltip">
+                  <p style={{ margin: 0, fontWeight: 700 }}>{step.label}</p>
+                  <p
+                    style={{
+                      margin: "0.35rem 0 0",
+                      fontSize: "0.72rem",
+                      letterSpacing: "0.06em",
+                      textTransform: "uppercase",
+                      color: "#9ae6c1",
+                    }}
+                  >
+                    {statusCopy(step.status)}
+                  </p>
+                  <p
+                    style={{
+                      margin: "0.55rem 0 0",
+                      fontSize: "0.875rem",
+                      lineHeight: 1.45,
+                      color: "rgba(255,255,255,0.82)",
+                    }}
+                  >
+                    {stepHint(step)}
+                  </p>
+                </div>
+              ) : null}
             </li>
           );
         })}
-      </ul>
+      </ol>
 
       {error?.message ? (
-        <div className="border-t border-[var(--line)] bg-[var(--warn-soft)] px-6 py-4 text-sm text-[var(--warn)]">
+        <div className="mt-8 rounded-xl border border-[var(--warn)]/30 bg-[var(--warn-soft)] px-4 py-3 text-sm text-[var(--warn)]">
           {error.code ? <strong className="mr-1">{error.code}:</strong> : null}
           {error.message}
         </div>
       ) : null}
-    </div>
+
+      <p className="pipeline-foot">
+        <span className="status-dot ok" />
+        Progress auto-saves — you can leave this page anytime.
+      </p>
+    </section>
   );
 }

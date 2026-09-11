@@ -42,8 +42,8 @@ describe("normalizeExtractionPayload", () => {
         behavioral: ["Team collaboration"],
       },
     });
-    expect(result.company).toBe("Unknown company");
-    expect(result.role).toBe("Unknown role");
+    expect(result.company).toBe("");
+    expect(result.role).toBe("");
     expect(result.requirements.length).toBeGreaterThanOrEqual(3);
     expect(result.requirements.every((r) => typeof r.text === "string")).toBe(true);
     expect(result.requirements.some((r) => r.kind === "technical")).toBe(true);

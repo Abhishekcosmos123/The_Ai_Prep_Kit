@@ -10,6 +10,7 @@ import type { GenerateKitInput, InterviewKit } from "../../types/kit.js";
 import type { PipelineResult, ProgressCallback } from "../../types/generation.js";
 import { AppError } from "../../utils/errors.js";
 import { localUrlsAllowed, validateExternalUrl } from "../../utils/urlValidator.js";
+import { resolveCompanyName, cleanMeta } from "../../utils/metaClean.js";
 import { ResearchService } from "../research/researchService.js";
 import {
   CompanyBriefGenerator,
@@ -283,18 +284,22 @@ export class KitGenerationPipeline {
 
       const kit: InterviewKit = {
         source: {
-          company: extracted.company || research.company_name,
+          company: resolveCompanyName({
+            extracted: extracted.company,
+            researched: research.company_name,
+            companyUrl,
+          }),
           company_url: companyUrl,
-          role: extracted.role,
-          location: extracted.location,
+          role: cleanMeta(extracted.role, "Role"),
+          location: cleanMeta(extracted.location),
           jd_chars: jd.length,
           researched_at: new Date().toISOString(),
           pages_used: research.pages_used,
         },
         company_brief,
         role: {
-          title: extracted.role,
-          seniority: extracted.seniority,
+          title: cleanMeta(extracted.role, "Role"),
+          seniority: cleanMeta(extracted.seniority),
           responsibilities: extracted.responsibilities,
           requirements: extracted.requirements,
         },

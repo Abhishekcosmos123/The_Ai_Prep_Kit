@@ -8,6 +8,7 @@ import {
 } from "../../types/kit.js";
 import type { LLMProvider } from "./llmProvider.js";
 import { wrapUntrustedContent, truncate } from "../../utils/textCleaner.js";
+import { cleanMeta } from "../../utils/metaClean.js";
 
 const KIND_SET = new Set<RequirementKind>([
   "technical",
@@ -109,26 +110,26 @@ export function normalizeExtractionPayload(raw: unknown): unknown {
       ? (data.role as Record<string, unknown>)
       : null;
 
-  const company = asString(
+  const company = cleanMeta(
     data.company ?? data.company_name ?? data.companyName ?? meta.company ?? root.company,
-    "Unknown company"
+    ""
   );
-  const role = asString(
+  const role = cleanMeta(
     (typeof data.role === "string" ? data.role : null) ??
       roleObj?.title ??
       data.role_title ??
       data.job_title ??
       data.title ??
       meta.role,
-    "Unknown role"
+    ""
   );
-  const location = asString(
+  const location = cleanMeta(
     data.location ?? data.job_location ?? roleObj?.location ?? meta.location,
-    "Unspecified"
+    ""
   );
-  const seniority = asString(
+  const seniority = cleanMeta(
     data.seniority ?? data.level ?? roleObj?.seniority ?? meta.seniority,
-    "unspecified"
+    ""
   );
   const responsibilities = asStringArray(
     data.responsibilities ?? data.responsibility ?? roleObj?.responsibilities ?? data.duties
@@ -201,10 +202,10 @@ const requirementItemSchema = z.object({
 const extractionSchema = z.preprocess(
   normalizeExtractionPayload,
   z.object({
-    company: z.string().default("Unknown company"),
-    role: z.string().default("Unknown role"),
-    location: z.string().default("Unspecified"),
-    seniority: z.string().default("unspecified"),
+    company: z.string().default(""),
+    role: z.string().default(""),
+    location: z.string().default(""),
+    seniority: z.string().default(""),
     responsibilities: z.array(z.string()).default([]),
     requirements: z.array(requirementItemSchema).default([]),
   })
@@ -260,10 +261,10 @@ export class RequirementExtractor {
     }));
 
     return {
-      company: result.company.trim() || "Unknown company",
-      role: result.role.trim() || "Unknown role",
-      location: result.location.trim() || "Unspecified",
-      seniority: result.seniority.trim() || "unspecified",
+      company: cleanMeta(result.company),
+      role: cleanMeta(result.role) || "Role",
+      location: cleanMeta(result.location),
+      seniority: cleanMeta(result.seniority),
       responsibilities: result.responsibilities.map((x) => x.trim()).filter(Boolean),
       requirements,
     };
