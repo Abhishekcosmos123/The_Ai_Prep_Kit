@@ -3,7 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import morgan from "morgan";
-import { env } from "./config/env.js";
+import { env, isOriginAllowed } from "./config/env.js";
 import { apiLimiter } from "./middleware/rateLimit.middleware.js";
 import { errorHandler, notFoundHandler } from "./middleware/error.middleware.js";
 import authRoutes from "./routes/auth.routes.js";
@@ -17,8 +17,17 @@ export function createApp() {
   app.use(helmet());
   app.use(
     cors({
-      origin: env.CLIENT_ORIGIN,
+      origin(origin, callback) {
+        if (isOriginAllowed(origin)) {
+          callback(null, origin || true);
+          return;
+        }
+        // Deny without throwing — a thrown error often looks like a CORS failure with no ACAO header.
+        callback(null, false);
+      },
       credentials: true,
+      methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"],
     })
   );
   app.use(morgan(env.NODE_ENV === "production" ? "combined" : "dev"));

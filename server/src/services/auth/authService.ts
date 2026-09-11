@@ -77,10 +77,15 @@ export class AuthService {
   }
 
   cookieOptions() {
+    const secure = env.COOKIE_SECURE || env.NODE_ENV === "production";
+    // Cross-site SPA (e.g. Vercel) → API (Railway) needs SameSite=None + Secure.
+    const sameSite =
+      env.COOKIE_SAMESITE ||
+      (env.NODE_ENV === "production" ? "none" : "lax");
     return {
       httpOnly: true,
-      secure: env.COOKIE_SECURE || env.NODE_ENV === "production",
-      sameSite: "lax" as const,
+      secure: sameSite === "none" ? true : secure,
+      sameSite: sameSite as "none" | "lax" | "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: "/",
     };

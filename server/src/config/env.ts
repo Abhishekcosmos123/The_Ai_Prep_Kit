@@ -8,11 +8,18 @@ const envSchema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
   MONGODB_URI: z.string().min(1),
   JWT_SECRET: z.string().min(16),
-  CLIENT_ORIGIN: z.string().url().default("http://localhost:3000"),
+  /**
+   * Frontend origin(s) allowed by CORS.
+   * Comma-separated is supported, e.g.
+   * https://my-app.vercel.app,http://localhost:3000
+   */
+  CLIENT_ORIGIN: z.string().default("http://localhost:3000"),
   COOKIE_SECURE: z
     .string()
     .optional()
     .transform((v) => v === "true"),
+  /** none | lax | strict — use "none" when frontend and API are on different sites (Vercel + Railway). */
+  COOKIE_SAMESITE: z.enum(["none", "lax", "strict"]).optional(),
   LLM_API_KEY: z.string().optional().default(""),
   LLM_MODEL: z.string().default("gpt-4o-mini"),
   LLM_BASE_URL: z.string().url().default("https://api.openai.com/v1"),
@@ -48,3 +55,16 @@ export const env = parsed.success
       JWT_SECRET: process.env.JWT_SECRET || "dev-only-secret-change-me",
       ...process.env,
     });
+
+/** Parsed allow-list for CORS (trims trailing slashes). */
+export function clientOrigins(): string[] {
+  return env.CLIENT_ORIGIN.split(",")
+    .map((o) => o.trim().replace(/\/+$/, ""))
+    .filter(Boolean);
+}
+
+export function isOriginAllowed(origin: string | undefined): boolean {
+  if (!origin) return true; // same-origin / curl / server-to-server
+  const normalized = origin.replace(/\/+$/, "");
+  return clientOrigins().includes(normalized);
+}

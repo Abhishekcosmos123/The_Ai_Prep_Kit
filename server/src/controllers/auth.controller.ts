@@ -38,7 +38,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 }
 
 export async function logout(_req: Request, res: Response) {
-  res.clearCookie(authService.cookieName(), { path: "/" });
+  res.clearCookie(authService.cookieName(), authService.cookieOptions());
   res.json({ ok: true });
 }
 
