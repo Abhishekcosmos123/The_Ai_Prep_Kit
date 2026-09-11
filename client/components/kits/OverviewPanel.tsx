@@ -1,6 +1,7 @@
 "use client";
 
 import { ClipboardList, Clock, Layers, MessageCircleQuestion } from "lucide-react";
+import type { CSSProperties } from "react";
 import type { InterviewKit, Requirement } from "@/types/kit";
 import { StatMetrics } from "@/components/ui/StatMetrics";
 
@@ -12,16 +13,48 @@ export function OverviewPanel({
   uncoveredIds: Set<string>;
 }) {
   const totalMinutes = kit.schedule.days.reduce((s, d) => s + d.minutes, 0);
+  const totalReqs = kit.role.requirements.length;
   const uncoveredCount = kit.role.requirements.filter((r) => uncoveredIds.has(r.id)).length;
+  const coveredCount = Math.max(0, totalReqs - uncoveredCount);
+  const coveragePct = totalReqs === 0 ? 100 : Math.round((coveredCount / totalReqs) * 100);
+  const mustCount = kit.role.requirements.filter((r) => r.priority === "must").length;
+  const niceCount = kit.role.requirements.filter((r) => r.priority === "nice").length;
 
   return (
-    <div className="space-y-10 ui-fade-up">
+    <div className="overview-panel ui-fade-up">
+      <header className="overview-head">
+        <div className="min-w-0">
+          <p className="brief-kicker">Kit snapshot</p>
+          <h2 className="font-display text-2xl font-bold tracking-tight">Overview</h2>
+          <p className="mt-1 text-sm text-[var(--muted)]">
+            Coverage, requirements, and role focus for this prep kit.
+          </p>
+        </div>
+        <div className="overview-coverage" aria-label={`Coverage ${coveragePct}%`}>
+          <div
+            className="overview-coverage-ring"
+            style={{ "--pct": `${coveragePct}` } as CSSProperties}
+          >
+            <span>{coveragePct}%</span>
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-[var(--ink)]">
+              {uncoveredCount === 0 ? "Fully covered" : `${uncoveredCount} gaps left`}
+            </p>
+            <p className="text-xs text-[var(--muted)]">
+              {coveredCount}/{totalReqs || 0} requirements have questions
+            </p>
+          </div>
+        </div>
+      </header>
+
       <StatMetrics
+        className="overview-stats"
         items={[
           {
             key: "requirements",
             label: "Requirements",
-            value: kit.role.requirements.length,
+            value: totalReqs,
             icon: ClipboardList,
           },
           {
@@ -45,35 +78,49 @@ export function OverviewPanel({
         ]}
       />
 
-      <section>
-        <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="font-display text-xl font-bold">Requirements</h2>
-          <p className="text-sm text-[var(--muted)]">
-            {uncoveredCount === 0 ? (
-              <span className="font-medium text-[var(--ok)]">All covered by questions</span>
-            ) : (
-              <span className="font-medium text-[var(--warn)]">
-                {uncoveredCount} still need questions
-              </span>
-            )}
-          </p>
+      <section className="overview-section">
+        <div className="overview-section-head">
+          <div>
+            <h3 className="font-display text-lg font-bold">Requirements</h3>
+            <p className="text-sm text-[var(--muted)]">
+              {mustCount} must · {niceCount} nice
+            </p>
+          </div>
+          {uncoveredCount === 0 ? (
+            <span className="overview-pill overview-pill-ok">All covered</span>
+          ) : (
+            <span className="overview-pill overview-pill-warn">
+              {uncoveredCount} need questions
+            </span>
+          )}
         </div>
-        <ul className="divide-y divide-[var(--line)]">
+
+        <ul className="req-card-list">
           {kit.role.requirements.map((r) => (
-            <RequirementRow key={r.id} requirement={r} covered={!uncoveredIds.has(r.id)} />
+            <RequirementCard key={r.id} requirement={r} covered={!uncoveredIds.has(r.id)} />
           ))}
           {!kit.role.requirements.length ? (
-            <li className="py-4 text-sm text-[var(--muted)]">No requirements extracted.</li>
+            <li className="req-card req-card-empty">No requirements extracted from this JD.</li>
           ) : null}
         </ul>
       </section>
 
       {kit.role.responsibilities?.length ? (
-        <section>
-          <h2 className="font-display text-xl font-bold">Role focus</h2>
-          <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-[var(--ink)]">
+        <section className="overview-section">
+          <div className="overview-section-head">
+            <div>
+              <h3 className="font-display text-lg font-bold">Role focus</h3>
+              <p className="text-sm text-[var(--muted)]">Key responsibilities from the posting</p>
+            </div>
+          </div>
+          <ul className="role-focus-list">
             {kit.role.responsibilities.map((item, i) => (
-              <li key={i}>{item}</li>
+              <li key={i} className="role-focus-item">
+                <span className="role-focus-index" aria-hidden>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <p>{item}</p>
+              </li>
             ))}
           </ul>
         </section>
@@ -82,7 +129,7 @@ export function OverviewPanel({
   );
 }
 
-function RequirementRow({
+function RequirementCard({
   requirement,
   covered,
 }: {
@@ -90,21 +137,17 @@ function RequirementRow({
   covered: boolean;
 }) {
   return (
-    <li className="flex gap-3 py-3.5 first:pt-0 last:pb-0">
-      <span
-        className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
-          covered ? "bg-[var(--ok)]" : "bg-[var(--warn)]"
-        }`}
-        title={covered ? "Covered" : "Uncovered"}
-        aria-label={covered ? "Covered" : "Uncovered"}
-      />
-      <div className="min-w-0">
-        <p className="text-[0.95rem] leading-snug text-[var(--ink)]">{requirement.text}</p>
-        <p className="mt-1 text-xs text-[var(--muted)]">
-          {requirement.kind} · {requirement.priority}
-          {covered ? "" : " · needs a question"}
-        </p>
+    <li className={`req-card ${covered ? "is-covered" : "is-gap"}`}>
+      <div className="req-card-top">
+        <span className={`req-priority ${requirement.priority}`}>
+          {requirement.priority}
+        </span>
+        <span className="req-kind">{requirement.kind}</span>
+        <span className={`req-cover-badge ${covered ? "ok" : "warn"}`}>
+          {covered ? "Covered" : "Needs question"}
+        </span>
       </div>
+      <p className="req-card-text">{requirement.text}</p>
     </li>
   );
 }

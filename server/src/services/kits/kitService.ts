@@ -5,6 +5,10 @@ import { AppError } from "../../utils/errors.js";
 import { createPipeline } from "../pipeline/kitGenerationPipeline.js";
 import { checkCoverage } from "../../engine/coverage/coverageChecker.js";
 import { allocateSchedule } from "../../engine/scheduling/scheduleAllocator.js";
+import {
+  mergeQuestionsForRegen,
+  reconcileScheduleQuestionIds,
+} from "../../engine/regen/questionRegen.js";
 import { validateKit } from "../../engine/validation/kitValidator.js";
 import {
   CompanyBriefGenerator,
@@ -283,19 +287,7 @@ export class KitService {
     const doc = await this.findOwned(userId, kitId);
     if (!doc.kit) throw new AppError("KIT_NOT_READY", "Kit not ready.", 409);
 
-    const preserved = doc.kit.questions.filter(
-      (q) => q.pinned || q.state === "edited" || q.state === "user"
-    );
-    const preservedIds = new Set(preserved.map((q) => q.id));
-
     const requirements = doc.kit.role.requirements;
-
-    // If category provided, only replace generated questions in that category
-    const keepOthers = category
-      ? doc.kit.questions.filter(
-          (q) => preservedIds.has(q.id) || q.category.toLowerCase() !== category.toLowerCase()
-        )
-      : preserved;
 
     const research = await new ResearchService().researchCompany(doc.input.company_url);
     const discussions = await new ResearchService().researchInterviews(
@@ -322,22 +314,15 @@ export class KitService {
       }
     );
 
-    const filteredGenerated = category
-      ? generated.filter((q) => q.category.toLowerCase() === category.toLowerCase())
-      : generated;
-
-    const questions = [...keepOthers, ...filteredGenerated.filter((q) => !preservedIds.has(q.id))];
+    const questions = mergeQuestionsForRegen(doc.kit.questions, generated, category);
     const coverage = checkCoverage(doc.kit.role.requirements, questions);
-    const schedule = allocateSchedule(
-      doc.kit.role.requirements,
-      questions,
-      doc.kit.schedule.days_available
-    );
+    // Preserve day focus/minutes (user schedule edits); only refresh question_ids.
+    const days = reconcileScheduleQuestionIds(doc.kit.schedule.days, questions);
 
     doc.kit = {
       ...doc.kit,
       questions,
-      schedule: { days_available: doc.kit.schedule.days_available, days: schedule },
+      schedule: { days_available: doc.kit.schedule.days_available, days },
       coverage: {
         uncovered_requirement_ids: coverage.uncovered_requirement_ids,
         passes: doc.kit.coverage.passes,

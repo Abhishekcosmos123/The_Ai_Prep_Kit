@@ -122,6 +122,7 @@ export function Stat({ label, value, tone }: { label: string; value: ReactNode; 
 export function Field({
   label,
   hint,
+  error,
   badge,
   children,
   className = "",
@@ -129,6 +130,7 @@ export function Field({
 }: {
   label: string;
   hint?: ReactNode;
+  error?: string;
   badge?: ReactNode;
   children: ReactNode;
   className?: string;
@@ -143,7 +145,13 @@ export function Field({
         {badge}
       </div>
       {children}
-      {hint ? <div className="ui-help">{hint}</div> : null}
+      {error ? (
+        <p className="ui-field-error" role="alert">
+          {error}
+        </p>
+      ) : hint ? (
+        <div className="ui-help">{hint}</div>
+      ) : null}
     </div>
   );
 }

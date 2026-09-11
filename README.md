@@ -199,21 +199,52 @@ Question volume is also scaled in code before the LLM call:
 
 ## State management & regeneration
 
-Questions/flashcards may include:
+This is the hardest state problem in the brief. We treat **user intent** as first-class data on each question/flashcard, and regeneration is a **surgical merge**, never a full document replace.
 
-- `state: "generated" | "edited" | "user"`
-- `pinned: boolean`
+### Representation
 
-**Regeneration rules:**
+| Field | Values | Meaning |
+|---|---|---|
+| `state` | `generated` | Produced by the LLM; safe to replace on regen |
+| `state` | `edited` | Was generated, then the user changed it — **survive regen** |
+| `state` | `user` | Created by hand in the builder — **survive regen** |
+| `pinned` | `true` \| `false` | Explicit “keep this” flag — **survive regen** even if still `generated` |
 
-- Company brief regenerate → replaces brief/sources only
-- Questions regenerate → keeps `edited`, `user`, and `pinned` questions
-- Single-category regenerate → replaces only that category’s generated questions; other categories and pinned/edited/user questions survive
-- Schedule regenerate → recomputes days from current questions only
+Transitions on the client (saved via `PATCH`):
 
-Practice history is stored separately on the Kit document and is not wiped by content regeneration.
+- Add question/flashcard → `state: "user"`
+- Edit a generated item → `state: "edited"` (user-authored items stay `"user"`)
+- Pin/unpin → flips `pinned` only; does not clear `edited` / `user`
+
+Pipeline-created content is always `state: "generated"`, `pinned: false`.
+
+A question is **protected** when `pinned || state === "edited" || state === "user"`.
+
+### Regeneration rules (section isolation)
+
+| Action | What changes | What is preserved |
+|---|---|---|
+| Regenerate **company brief** | `company_brief` + `source.pages_used` / `researched_at` | Questions, flashcards, schedule, practice |
+| Regenerate **all questions** | Unprotected questions only | Protected questions; flashcards; brief; practice; schedule **focus/minutes** |
+| Regenerate **one category** | Unprotected questions **in that category** only | Protected questions (any category); all other categories; flashcards; brief; practice; schedule focus/minutes |
+| Regenerate **schedule** | Day allocation from current questions | Brief, questions, flashcards, practice |
+
+Implementation: `server/src/engine/regen/questionRegen.ts` (`mergeQuestionsForRegen`, `reconcileScheduleQuestionIds`), called from `kitService.regenerate*`.
+
+After question regen we **do not** call `allocateSchedule` again (that would wipe custom day focus/minutes). We only refresh `question_ids` so removed questions drop out and new ones are placed round-robin across existing days.
+
+Coverage is recomputed in code after question merges. Practice confidences live on a separate Kit field and are never cleared by content regen.
+
+### Why this model
+
+- `state` answers “who authored this?” — needed so an edited prompt is not treated like a fresh LLM draft.
+- `pinned` answers “keep even if still generated?” — lets users lock a good generated question without editing it.
+- Separating the two avoids forcing every keep into an edit, and avoids losing hand-written items when someone unpins.
+
+Automated tests: `server/tests/questionRegen.test.ts`.
 
 Duplicate submissions of the same JD + company URL return `409 DUPLICATE_KIT` with the existing kit id. The UI offers “Open existing” or “Create another anyway” (`force=true`).
+
 ---
 
 ## Research / retrieval
@@ -273,14 +304,18 @@ Multi-role prep: use **Create kit → Batch upload** (JSON or CSV with `jd,compa
 
 ## Batch evaluator
 
-Uses the **same** `KitGenerationPipeline` as the web app:
+Uses the **same** `KitGenerationPipeline` as the web app. From a clean clone (after `cd server && npm install`):
 
 ```bash
+# From repo root (Section 9) — proxies into server/
+npm run evaluate -- --input fixtures/cases.json --output kits.json --mock
+
+# Or from server/
 cd server
 npm run evaluate -- --input fixtures/cases.json --output fixtures/kits.json --mock
 ```
 
-Omit `--mock` when `LLM_API_KEY` is configured for real generation.
+Omit `--mock` when `LLM_API_KEY` is configured for real generation. Paths resolve relative to `server/` (the evaluate working directory).
 
 - Continues after individual case failures
 - Writes one entry per input id (Appendix B shape)
@@ -316,58 +351,3 @@ Next session sorts flashcards by ascending confidence; cards never practiced are
 
 Practice mode also shows **covered vs not covered** (rated at least once vs never rated) before a session starts.
 ---
-
-## Deployment (Railway)
-
-1. Create a Railway service from this GitHub repo.
-2. Set **Root Directory** to `server` (Service → Settings → Root Directory).
-3. Set variables (at minimum):
-
-```env
-NODE_ENV=production
-PORT=4000
-MONGODB_URI=mongodb+srv://USER:PASS@CLUSTER/the_ai_prep_kit
-JWT_SECRET=long-random-string
-CLIENT_ORIGIN=https://YOUR-FRONTEND.vercel.app
-COOKIE_SECURE=true
-COOKIE_SAMESITE=none
-LLM_API_KEY=
-LLM_PROVIDER=mock
-ALLOW_LOCAL_URLS=false
-```
-
-4. Deploy. Confirm:
-
-```bash
-curl https://YOUR-SERVICE.up.railway.app/api/health
-# {"ok":true,"service":"the-ai-prep-kit","version":"1.0"}
-```
-
-Production start uses `npm run build` → `node dist/index.js` (not `tsx`). If health returns 502, open Railway **Deploy Logs** — the usual causes are wrong Root Directory, missing `MONGODB_URI`, or the process crashing before listen.
-
-On the frontend host (e.g. Vercel):
-
-```env
-NEXT_PUBLIC_API_URL=https://YOUR-SERVICE.up.railway.app
-```
-
----
-
-## Scripts
-
-**Server**
-
-```bash
-npm run dev
-npm start
-npm test
-npm run evaluate -- --input fixtures/cases.json --output out.json
-```
-
-**Client**
-
-```bash
-npm run dev
-npm run build
-npm run lint
-```

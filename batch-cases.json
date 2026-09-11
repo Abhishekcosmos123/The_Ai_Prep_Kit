@@ -1,62 +1,62 @@
 [
   {
-    "id": "case-01-fullstack-typescript",
-    "jd": "Software Engineer — Platform\n\nAbout the role\nWe are hiring a mid-level Software Engineer to build APIs and internal tools that power our product. You will work closely with product and design.\n\nResponsibilities\n- Design and implement REST APIs in TypeScript/Node.js\n- Own features end-to-end from design review to production\n- Improve reliability, observability, and developer experience\n- Participate in on-call rotation and incident reviews\n\nRequirements (must have)\n- 3+ years professional software engineering experience\n- Strong TypeScript and Node.js\n- Experience designing REST APIs and relational data models (PostgreSQL)\n- Comfortable with Git, code review, and CI/CD basics\n- Clear written and verbal communication\n\nNice to have\n- GraphQL\n- Experience with Redis or message queues\n- Prior startup experience\n\nLocation: Remote (US time zones preferred)",
-    "company_url": "https://example.com",
+    "id": "case-01-posthog-fullstack",
+    "jd": "Full Stack Engineer\n\nLocation: Remote (Americas / EMEA)\nTeam: Product Engineering\n\nAbout PostHog\nWe're building the developer platform for building successful products — analytics, session replay, feature flags, experiments, and more in one product.\n\nWhat you'll do\n- Own features end-to-end across our Django/Python backend and React/TypeScript frontend\n- Ship product improvements used by tens of thousands of companies\n- Work with a small, high-trust team; write RFCs when decisions need alignment\n- Improve reliability, performance, and developer experience as you go\n\nMust-have requirements\n- Strong experience with TypeScript and modern React\n- Comfortable with Python (Django or similar) or willing to ramp quickly\n- Experience designing and shipping production web apps\n- Clear written communication; we work asynchronously\n- Product sense: you care about the user problem, not only the ticket\n\nNice to have\n- ClickHouse, Postgres, Redis, or Kafka experience\n- Prior work on analytics, experimentation, or developer tools\n- Open-source contributions\n\nInterview process typically includes an applications review, a technical screen, a paid take-home (or equivalent), and team / culture conversations. We publish how we hire in our handbook.",
+    "company_url": "https://posthog.com",
+    "days": 7
+  },
+  {
+    "id": "case-02-gitlab-backend",
+    "jd": "Backend Engineer, Verify\n\nLocation: Remote\nDepartment: Engineering\n\nGitLab is an open-core DevSecOps platform. The Verify stage owns CI pipelines, runners, and related reliability work that millions of developers depend on daily.\n\nResponsibilities\n- Design and implement backend features in Ruby on Rails and supporting services\n- Improve pipeline performance, correctness, and observability\n- Collaborate publicly in issues and merge requests; default to async written communication\n- Participate in on-call and incident reviews for CI-related services\n\nRequired qualifications\n- 4+ years professional backend engineering experience\n- Strong skills in Ruby, Go, or Python and willingness to work primarily in Rails\n- Experience with PostgreSQL (schema design, indexing, query performance)\n- Familiarity with distributed systems concepts: queues, retries, idempotency, eventual consistency\n- Experience with Docker-based development and CI systems\n\nPreferred qualifications\n- Prior work on CI/CD products or large-scale job execution systems\n- Kubernetes operations experience\n- Contributions to open source\n- Experience working in a remote-only, handbook-first company\n\nWe document our hiring process and values publicly. Expect technical interviews focused on real GitLab problems, not puzzle trivia.",
+    "company_url": "https://about.gitlab.com",
     "days": 5
   },
   {
-    "id": "case-02-backend-python",
-    "jd": "Backend Engineer\n\nWe need a Backend Engineer who can scale data-heavy services.\n\nMust have:\n- 5+ years Python experience\n- Strong PostgreSQL skills (schema design, indexing, query performance)\n- Experience with distributed systems (queues, retries, idempotency)\n- Familiarity with Docker and cloud deployments\n\nPreferred:\n- Kubernetes\n- Kafka or similar event streaming\n- Experience with Python async frameworks (FastAPI/asyncio)\n\nYou will collaborate with data science and infrastructure teams to ship reliable batch and real-time pipelines.",
-    "company_url": "https://www.python.org",
-    "days": 3
-  },
-  {
     "id": "case-03-thin-jd",
-    "jd": "Short JD.\nBuild features.\nShip fast.",
+    "jd": "Engineer.\nNeed someone who can code.\nStart ASAP.",
     "company_url": "https://example.com",
     "days": 1
   },
   {
     "id": "case-04-unreachable-company",
-    "jd": "Frontend Engineer\n\nMust know React and modern JavaScript/TypeScript.\nRequired: accessibility (WCAG) knowledge and component-driven UI.\nBehavioral: stakeholder communication and design collaboration.\nNice to have: Next.js and Storybook.\n\nYou will own customer-facing UI for our dashboard product.",
+    "jd": "Senior Frontend Engineer\n\nWe're hiring someone to own our customer dashboard UI.\n\nRequired\n- Expert React and TypeScript\n- Strong accessibility (WCAG 2.2) practice\n- Experience with design systems and component libraries\n- Comfortable partnering with Product and Design\n\nNice to have\n- Next.js App Router\n- Storybook / Chromatic\n- GraphQL (Apollo or urql)\n\nYou will lead frontend architecture discussions and mentor mid-level engineers.\nInterview includes a UI take-home and a frontend system-design round.",
     "company_url": "https://this-domain-should-not-resolve-xyz123.invalid",
     "days": 4
   },
   {
-    "id": "case-05-dense-requirements",
-    "jd": "Full-Stack Engineer\n\nMust have:\n- TypeScript\n- React\n- Node.js\n- System design fundamentals\n- CI/CD experience (GitHub Actions or similar)\n- Automated testing (unit + integration)\n\nRequired domain experience:\n- Building multi-tenant SaaS features\n- AuthN/AuthZ patterns (sessions/JWT/RBAC)\n\nPreferred:\n- AWS (ECS or Lambda)\n- Observability (OpenTelemetry, Datadog, or similar)\n- Experience mentoring juniors\n\nThis role blends product feature work with reliability improvements.",
+    "id": "case-05-stripe-payments",
+    "jd": "Software Engineer, Payments\n\nLocation: Hybrid / Remote-flexible\n\nStripe builds economic infrastructure for the internet. The Payments organization works on authorization, capture, retries, and money movement used by millions of businesses.\n\nWhat you'll work on\n- Design and implement highly reliable services that move money correctly\n- Debug subtle production issues across distributed systems\n- Partner with Risk, Treasury, and Product on payment-method expansions\n- Write clear design docs and participate in thoughtful code review\n\nMinimum qualifications\n- 3+ years of professional software engineering experience\n- Proficiency in at least one of: Java, Go, Ruby, or TypeScript\n- Experience building and operating production services\n- Strong fundamentals in data structures, APIs, and relational databases\n- Ability to reason about failure modes, idempotency, and consistency\n\nPreferred qualifications\n- Prior payments, fintech, or high-correctness systems experience\n- Experience with event-driven architectures and queue-based workflows\n- Familiarity with observability (metrics, traces, structured logging)\n- Experience mentoring engineers or leading projects\n\nWe value precision, user empathy, and intellectual honesty. Expect interviews that probe real system design and debugging judgment.",
     "company_url": "https://stripe.com",
-    "days": 7
-  },
-  {
-    "id": "case-06-frontend-product",
-    "jd": "Senior Frontend Engineer\n\nJoin our product engineering team to craft high-quality web experiences.\n\nWhat you'll do\n- Build performant React interfaces with strong UX polish\n- Partner with designers on interaction details and accessibility\n- Improve frontend architecture, testing, and bundle performance\n\nMust-haves\n- Expert React and TypeScript\n- Deep understanding of browser performance and accessibility\n- Experience with design systems / component libraries\n- Ability to lead technical discussions and mentor others\n\nNice-to-haves\n- Next.js App Router\n- Experience with animation and complex forms\n- GraphQL clients (Apollo/urql)\n\nInterview process includes a UI take-home and a system design conversation focused on frontend architecture.",
-    "company_url": "https://vercel.com",
     "days": 10
   },
   {
-    "id": "case-07-pm-behavioral",
-    "jd": "Product Manager — Growth\n\nWe are looking for a Product Manager to own activation and retention experiments.\n\nResponsibilities\n- Define problem statements and success metrics\n- Run A/B tests and interpret results with data partners\n- Write crisp PRDs and align engineering/design stakeholders\n- Present roadmap tradeoffs to leadership\n\nMust have\n- 4+ years product management experience in B2B or consumer SaaS\n- Strong analytical skills (SQL preferred)\n- Excellent stakeholder communication and prioritization\n- Experience shipping experiments end-to-end\n\nNice to have\n- Prior growth or monetization ownership\n- Familiarity with Amplitude/Mixpanel\n- Technical background sufficient to discuss API constraints\n\nBehavioral focus: conflict resolution, ambiguous problem framing, and customer empathy.",
-    "company_url": "https://www.notion.so",
-    "days": 6
-  },
-  {
-    "id": "case-08-devops-sre",
-    "jd": "Site Reliability Engineer\n\nOwn reliability for customer-facing services.\n\nRequired\n- Production experience with Linux systems and networking basics\n- Infrastructure as code (Terraform or equivalent)\n- Observability: metrics, logs, traces, SLOs/error budgets\n- Incident response and blameless postmortems\n- Scripting in Python or Go\n\nPreferred\n- Kubernetes in production\n- Chaos engineering or load testing practice\n- Multi-cloud experience\n\nYou will partner with application teams to improve deploy safety and reduce MTTR.",
-    "company_url": "https://github.com",
+    "id": "case-06-vercel-frontend",
+    "jd": "Senior Software Engineer, Frontend Platform\n\nLocation: Remote (US)\n\nVercel enables developers to build and deploy modern web applications. Frontend Platform improves the frameworks, tooling, and product surfaces millions of developers use.\n\nRole overview\n- Build polished, accessible UI in React and TypeScript\n- Improve performance: Core Web Vitals, bundling, streaming, caching\n- Collaborate with Design on interaction quality and design-system consistency\n- Contribute to Next.js / React ecosystem knowledge inside the company\n\nRequirements\n- Deep expertise in React and TypeScript\n- Production experience with Next.js (App Router preferred)\n- Strong grasp of browser performance, accessibility, and progressive enhancement\n- Experience owning frontend architecture for a substantial product surface\n- Excellent written communication for RFCs and design reviews\n\nBonus points\n- Contributions to Next.js, React, or related open source\n- Experience with edge runtimes, ISR/SSR tradeoffs, and CDN caching\n- Design-system / component-library authorship\n- Mentoring and technical leadership\n\nInterviewing typically includes practical coding, a system or architecture discussion, and team collaboration conversations.",
+    "company_url": "https://vercel.com",
     "days": 8
   },
   {
-    "id": "case-09-data-ml",
-    "jd": "Machine Learning Engineer\n\nBuild and productionize ML features for search and recommendations.\n\nMust have\n- Strong Python and software engineering fundamentals\n- Experience training and evaluating ML models\n- Familiarity with feature pipelines and offline/online evaluation\n- Ability to collaborate with product on metric definitions\n\nRequired technical skills\n- SQL and data warehousing concepts\n- Experience deploying models behind APIs or batch jobs\n\nNice to have\n- PyTorch or TensorFlow\n- Vector search / embeddings\n- Experience with LLM application patterns (RAG, evaluation harnesses)\n\nSeniority: Mid to Senior. Location: Hybrid.",
-    "company_url": "https://openai.com",
-    "days": 14
+    "id": "case-07-linear-fullstack",
+    "jd": "Full-Stack Engineer\n\nLocation: Remote (Americas)\n\nLinear builds the issue tracking and project management tool purpose-built for high-performance teams. We care deeply about speed, craft, and opinionated product design.\n\nYou will\n- Ship features across our TypeScript stack (Node, GraphQL, React)\n- Obsess over latency, keyboard flows, and interaction details\n- Work closely with product and design in a small engineering team\n- Help maintain a high quality bar through review and technical taste\n\nMust have\n- Strong TypeScript across frontend and backend\n- Experience building complex React applications with excellent UX\n- Familiarity with GraphQL APIs and real-time / sync-heavy clients\n- High bar for code quality, performance, and product polish\n- Ability to operate independently in an async remote culture\n\nNice to have\n- Experience with CRDTs, offline-first, or collaborative editing\n- Prior work on developer tools or productivity software\n- Design sensibility / ability to implement nuanced UI without pixel-pushing tickets\n\nWe hire for craft. Expect interviews that value taste and systems thinking as much as algorithm drills.",
+    "company_url": "https://linear.app",
+    "days": 6
   },
   {
-    "id": "case-10-long-schedule-junior",
-    "jd": "Junior Software Engineer (New Grad)\n\nWe hire curious engineers who learn quickly and write clear code.\n\nRequirements\n- CS degree or equivalent practical experience\n- Comfortable with at least one language (JavaScript/TypeScript, Python, or Java)\n- Understanding of data structures and algorithms basics\n- Willingness to ask questions and accept feedback\n\nYou will\n- Ship small features with mentorship\n- Write tests and documentation\n- Participate in code review\n\nPreferred\n- Internship experience\n- Side projects or open-source contributions\n- Exposure to web development or APIs\n\nThis case is meant to exercise a longer prep window with a lighter JD.",
-    "company_url": "https://www.mozilla.org",
-    "days": 21
+    "id": "case-08-notion-pm",
+    "jd": "Product Manager, Growth\n\nLocation: Hybrid (San Francisco) / Remote-flexible\n\nNotion is an AI workspace for notes, docs, wikis, and projects. Growth PM owns activation, retention, and expansion loops that help teams adopt Notion.\n\nResponsibilities\n- Define problem statements, hypotheses, and success metrics for growth experiments\n- Partner with Engineering, Design, Data, and Marketing to ship and learn quickly\n- Analyze funnels (SQL + product analytics) and turn insights into roadmap bets\n- Write crisp specs and communicate tradeoffs to leadership\n- Represent the customer with empathy — especially new teams ramping onto Notion\n\nMust-have qualifications\n- 4+ years of product management experience in B2B or consumer SaaS\n- Proven ownership of activation, retention, or monetization experiments\n- Strong analytical skills; SQL preferred\n- Excellent written and verbal communication; comfortable with ambiguity\n- Experience aligning cross-functional stakeholders without heavy process\n\nNice to have\n- Prior work on collaboration / productivity products\n- Familiarity with Amplitude, Mixpanel, or equivalent\n- Technical background sufficient to discuss API and performance constraints\n- Experience with AI-assisted product surfaces\n\nBehavioral interviews emphasize prioritization under constraint, conflict resolution, and customer discovery.",
+    "company_url": "https://www.notion.com",
+    "days": 5
+  },
+  {
+    "id": "case-09-cloudflare-sre",
+    "jd": "Systems Engineer / SRE\n\nLocation: Remote\n\nCloudflare operates a global network that secures and accelerates Internet properties. Systems engineers keep edge and control-plane services reliable at massive scale.\n\nWhat you'll do\n- Operate and improve highly available distributed systems on our edge network\n- Define SLIs/SLOs, build useful dashboards, and drive error-budget conversations\n- Automate toil with solid engineering (Go, Rust, or Python — depth beats checklist breadth)\n- Lead incident response and write blameless postmortems that change the system\n- Partner with product engineering teams on deploy safety and capacity planning\n\nRequired\n- Production experience with Linux, networking fundamentals, and large-scale services\n- Infrastructure as code (Terraform or equivalent) and CI/CD for infra changes\n- Hands-on observability: metrics, logs, traces; comfort with SLO/error-budget thinking\n- Strong scripting/software skills in Go, Python, or Rust\n- Clear communication during incidents and in written follow-ups\n\nPreferred\n- Experience with CDN, DNS, reverse proxies, or TLS termination at scale\n- Kubernetes or other orchestration in production\n- Chaos engineering / load testing practice\n- Prior on-call ownership for customer-facing systems\n\nWe care about practical debugging judgment and systems intuition.",
+    "company_url": "https://www.cloudflare.com",
+    "days": 9
+  },
+  {
+    "id": "case-10-openai-ml-platform",
+    "jd": "Machine Learning Engineer, Platform\n\nLocation: San Francisco (Hybrid)\n\nOpenAI builds AI systems and developer platforms. ML Platform engineers make training and inference workflows reliable, measurable, and usable by research and applied teams.\n\nResponsibilities\n- Build and productionize pipelines for training, evaluation, and deployment\n- Improve offline/online evaluation harnesses and experiment tracking\n- Partner with researchers and product engineers on metric definitions and launch criteria\n- Raise the quality bar for reliability, observability, and developer experience of ML systems\n\nMust-have requirements\n- Strong Python and software engineering fundamentals\n- Experience training, evaluating, and shipping ML models or LLM application systems\n- Familiarity with feature/data pipelines and warehouse concepts (SQL)\n- Ability to deploy models behind APIs, batch jobs, or streaming scorers\n- Clear collaboration skills with research and product partners\n\nNice to have\n- PyTorch at scale; distributed training familiarity\n- Vector search / embeddings / RAG evaluation experience\n- Prior work on LLM eval harnesses, red-teaming tooling, or safety evals\n- Experience operating GPU fleets or inference services\n\nSeniority: Mid to Senior. Expect interviews covering ML systems design, coding, and cross-functional collaboration.",
+    "company_url": "https://openai.com",
+    "days": 14
   }
 ]

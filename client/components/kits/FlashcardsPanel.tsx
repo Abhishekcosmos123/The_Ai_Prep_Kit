@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Flashcard, Requirement } from "@/types/kit";
 import { IconEdit, IconTrash } from "@/components/ui/Icons";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { FlashcardEditorModal, type FlashcardDraft } from "@/components/kits/FlashcardEditorModal";
 
 export function FlashcardsPanel({
@@ -18,6 +19,7 @@ export function FlashcardsPanel({
   const [modal, setModal] = useState<null | { mode: "add" } | { mode: "edit"; card: Flashcard }>(
     null
   );
+  const { confirm, dialog: confirmDialog } = useConfirm();
 
   function saveDraft(draft: FlashcardDraft) {
     if (modal?.mode === "edit") {
@@ -77,8 +79,17 @@ export function FlashcardsPanel({
                     title="Delete flashcard"
                     aria-label="Delete flashcard"
                     onClick={() => {
-                      if (!confirm("Delete this flashcard?")) return;
-                      onChangeFlashcards(flashcards.filter((x) => x.id !== f.id));
+                      void (async () => {
+                        const ok = await confirm({
+                          eyebrow: "Delete flashcard",
+                          title: "Delete this flashcard?",
+                          body: "It will be removed from this kit. Save the kit to keep this change.",
+                          confirmLabel: "Delete flashcard",
+                          danger: true,
+                        });
+                        if (!ok) return;
+                        onChangeFlashcards(flashcards.filter((x) => x.id !== f.id));
+                      })();
                     }}
                   >
                     <IconTrash />
@@ -96,12 +107,10 @@ export function FlashcardsPanel({
                   <span className="flash-face flash-face-front">
                     <span className="flash-face-label">Front</span>
                     <span className="flash-face-text">{f.front}</span>
-                    <span className="flash-face-hint">Click to flip</span>
                   </span>
                   <span className="flash-face flash-face-back">
                     <span className="flash-face-label">Back</span>
                     <span className="flash-face-text">{f.back}</span>
-                    <span className="flash-face-hint">Click to flip</span>
                   </span>
                 </span>
               </button>
@@ -122,6 +131,7 @@ export function FlashcardsPanel({
           onSave={saveDraft}
         />
       ) : null}
+      {confirmDialog}
     </section>
   );
 }

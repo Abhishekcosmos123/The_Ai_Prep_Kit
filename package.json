@@ -1,0 +1,13 @@
+{
+  "name": "the-ai-prep-kit",
+  "private": true,
+  "description": "The AI Prep Kit — root scripts proxy into server/ and client/",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "evaluate": "npm run evaluate --prefix ./server --",
+    "test": "npm test --prefix ./server",
+    "typecheck": "npm run typecheck --prefix ./server"
+  }
+}

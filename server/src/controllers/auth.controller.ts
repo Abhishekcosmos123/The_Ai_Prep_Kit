@@ -3,14 +3,18 @@ import { z } from "zod";
 import { authService } from "../services/auth/authService.js";
 
 const registerSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-  name: z.string().min(1).max(100),
+  email: z.string().email("Enter a valid email address."),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters.")
+    .regex(/[A-Za-z]/, "Password must include a letter.")
+    .regex(/\d/, "Password must include a number."),
+  name: z.string().trim().min(1, "Name is required.").max(100, "Name must be 100 characters or fewer."),
 });
 
 const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
+  email: z.string().email("Enter a valid email address."),
+  password: z.string().min(1, "Password is required."),
 });
 
 export async function register(req: Request, res: Response, next: NextFunction) {

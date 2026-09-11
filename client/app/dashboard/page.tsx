@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { EmptyState, statusBadgeClass, statusLabel } from "@/components/ui/primitives";
-import { IconFileText, IconOpen, IconPlus, IconSearch, IconTrash } from "@/components/ui/Icons";
-import { AuthGate } from "@/hooks/useRequireAuth";
+import { EmptyState, LoadingBlock, statusBadgeClass, statusLabel } from "@/components/ui/primitives";
+import { IconFileText, IconOpen, IconPlus, IconSearch, IconSort, IconTrash } from "@/components/ui/Icons";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { api } from "@/lib/api";
 import type { KitSummary } from "@/types/kit";
 import { initials } from "@/lib/format";
@@ -34,21 +35,53 @@ function coveragePct(kit: KitSummary) {
   return Math.round(v <= 1 ? v * 100 : v);
 }
 
-function DashboardInner() {
+export default function DashboardPage() {
+  const { user, loading: authLoading } = useRequireAuth();
+  const { confirm, dialog: confirmDialog } = useConfirm();
   const [kits, setKits] = useState<KitSummary[]>([]);
+  const [kitsLoading, setKitsLoading] = useState(true);
   const [error, setError] = useState("");
   const [deleting, setDeleting] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<"newest" | "name">("newest");
 
   useEffect(() => {
+    if (authLoading) return;
+    if (!user) {
+      setKitsLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setKitsLoading(true);
+    setError("");
     void api<{ kits: KitSummary[] }>("/api/kits")
-      .then((d) => setKits(d.kits))
-      .catch((err) => setError(err instanceof Error ? err.message : "Failed to load kits"));
-  }, []);
+      .then((d) => {
+        if (!cancelled) setKits(d.kits);
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : "Failed to load kits");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setKitsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authLoading, user]);
 
   async function removeKit(id: string, company: string) {
-    if (!confirm(`Delete the prep kit for ${company}?`)) return;
+    const ok = await confirm({
+      eyebrow: "Delete kit",
+      title: `Delete kit for ${company}?`,
+      body: "This permanently removes the kit, questions, flashcards, and practice history. This cannot be undone.",
+      confirmLabel: "Delete kit",
+      danger: true,
+    });
+    if (!ok) return;
     setDeleting(id);
     try {
       await api(`/api/kits/${id}`, { method: "DELETE" });
@@ -60,8 +93,12 @@ function DashboardInner() {
     }
   }
 
-  const ready = kits.filter((k) => k.generationStatus === "completed" || k.generationStatus === "incomplete").length;
-  const running = kits.filter((k) => k.generationStatus === "queued" || k.generationStatus === "running").length;
+  const readyCount = kits.filter(
+    (k) => k.generationStatus === "completed" || k.generationStatus === "incomplete"
+  ).length;
+  const running = kits.filter(
+    (k) => k.generationStatus === "queued" || k.generationStatus === "running"
+  ).length;
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -82,6 +119,11 @@ function DashboardInner() {
     return next;
   }, [kits, query, sort]);
 
+  // One loader for auth + kits (and while redirecting unauthenticated users).
+  if (authLoading || !user || kitsLoading) {
+    return <LoadingBlock label="Loading kits…" />;
+  }
+
   return (
     <div className="ui-page">
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
@@ -98,22 +140,21 @@ function DashboardInner() {
             your profile.
           </p>
         </div>
-        
       </div>
 
       {kits.length > 0 ? (
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[var(--muted)]">
-            <span>
-              <strong className="text-[var(--ink)]">{kits.length}</strong> kits total
+        <div className="dash-toolbar">
+          <div className="dash-stats" aria-label="Kit summary">
+            <span className="dash-stat">
+              <strong>{kits.length}</strong> kits total
             </span>
-            <span className="inline-flex items-center gap-1.5">
-              <span className="status-dot ok" />
-              <strong className="text-[var(--ok)]">{ready}</strong> ready
+            <span className="dash-stat dash-stat-ok">
+              <span className="status-dot ok" aria-hidden />
+              <strong>{readyCount}</strong> ready
             </span>
-            <span className="inline-flex items-center gap-1.5">
-              <span className="status-dot muted" />
-              <strong className="text-[var(--ink)]">{running}</strong> generating
+            <span className={`dash-stat ${running > 0 ? "dash-stat-run" : ""}`}>
+              <span className={`status-dot ${running > 0 ? "" : "muted"}`} aria-hidden />
+              <strong>{running}</strong> generating
             </span>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -128,10 +169,16 @@ function DashboardInner() {
             </label>
             <button
               type="button"
-              className="ui-btn ui-btn-secondary !text-sm"
+              className="ui-icon-btn"
+              title={
+                sort === "newest"
+                  ? "Sorted by newest — click for name"
+                  : "Sorted by name — click for newest"
+              }
+              aria-label={sort === "newest" ? "Sort by name" : "Sort by newest"}
               onClick={() => setSort((s) => (s === "newest" ? "name" : "newest"))}
             >
-              Sort · {sort === "newest" ? "Newest" : "Name"}
+              <IconSort />
             </button>
           </div>
         </div>
@@ -168,11 +215,7 @@ function DashboardInner() {
             return (
               <article key={kit.id} className="kit-card ui-fade-up">
                 <div className="kit-card-top">
-                  <div
-                    className="kit-avatar"
-                    style={{ background: tone }}
-                    aria-hidden
-                  >
+                  <div className="kit-avatar" style={{ background: tone }} aria-hidden>
                     {initials(name)}
                   </div>
                   <div className="min-w-0 flex-1">
@@ -248,14 +291,7 @@ function DashboardInner() {
         </span>
         <span>© {new Date().getFullYear()} The AI Prep Kit</span>
       </footer>
+      {confirmDialog}
     </div>
-  );
-}
-
-export default function DashboardPage() {
-  return (
-    <AuthGate>
-      <DashboardInner />
-    </AuthGate>
   );
 }

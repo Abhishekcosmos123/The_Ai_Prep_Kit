@@ -22,7 +22,10 @@ import {
   RefreshCw,
   Save,
   SquarePen,
+  Eye,
+  EyeOff,
   Search,
+  ArrowUpDown,
   Sparkles,
   Trash2,
   Upload,
@@ -63,6 +66,9 @@ export const IconSpark = withDefaults(Sparkles);
 export const IconChart = withDefaults(BarChart3);
 export const IconVideo = withDefaults(Video);
 export const IconSearch = withDefaults(Search);
+export const IconEye = withDefaults(Eye);
+export const IconEyeOff = withDefaults(EyeOff);
+export const IconSort = withDefaults(ArrowUpDown);
 export const IconGlobe = withDefaults(Globe);
 export const IconInfo = withDefaults(Info);
 export const IconMinus = withDefaults(Minus);

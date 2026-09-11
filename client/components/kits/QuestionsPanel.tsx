@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { Question, Requirement } from "@/types/kit";
 import { IconDown, IconEdit, IconPin, IconRefresh, IconTrash } from "@/components/ui/Icons";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { QuestionEditorModal, type QuestionDraft } from "@/components/kits/QuestionEditorModal";
 import { useLongPressReorder } from "@/hooks/useLongPressReorder";
 import { byId, reorderList } from "@/lib/kitOrder";
@@ -28,6 +29,7 @@ export function QuestionsPanel({
   const [modal, setModal] = useState<null | { mode: "add" } | { mode: "edit"; question: Question }>(
     null
   );
+  const { confirm, dialog: confirmDialog } = useConfirm();
   const reqById = useMemo(() => byId(requirements), [requirements]);
 
   const reorderItems = useMemo(
@@ -95,8 +97,7 @@ export function QuestionsPanel({
       {categories.length > 1 ? (
         <div className="regen-row">
           <span className="regen-label">
-            <IconRefresh size={14} />
-            Regen category
+            Regen category:
           </span>
           <div className="regen-tags">
             {categories.map((cat) => {
@@ -172,8 +173,17 @@ export function QuestionsPanel({
                     title="Delete question"
                     aria-label="Delete question"
                     onClick={() => {
-                      if (!confirm("Delete this question?")) return;
-                      onChangeQuestions(questions.filter((x) => x.id !== q.id));
+                      void (async () => {
+                        const ok = await confirm({
+                          eyebrow: "Delete question",
+                          title: "Delete this question?",
+                          body: "It will be removed from the question bank. Save the kit to keep this change.",
+                          confirmLabel: "Delete question",
+                          danger: true,
+                        });
+                        if (!ok) return;
+                        onChangeQuestions(questions.filter((x) => x.id !== q.id));
+                      })();
                     }}
                   >
                     <IconTrash />
@@ -231,6 +241,7 @@ export function QuestionsPanel({
           onSave={saveDraft}
         />
       ) : null}
+      {confirmDialog}
     </section>
   );
 }
