@@ -1280,6 +1280,9 @@ button, input, textarea, select { font: inherit; }
   box-shadow: var(--shadow-lg);
   overflow: hidden;
 }
+.p-2 {
+  padding: 0.5rem;
+}
 .ui-modal-wide {
   width: min(40rem, 100%);
 }

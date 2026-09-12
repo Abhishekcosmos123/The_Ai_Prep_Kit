@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { api } from "@/lib/api";
 import type { Flashcard, InterviewKit, Question } from "@/types/kit";
 import { IconClose, IconEdit, IconRefresh, IconSave } from "@/components/ui/Icons";
@@ -70,6 +70,16 @@ export function KitBuilder({
   const [regenOpen, setRegenOpen] = useState(false);
   const [tab, setTab] = useState<KitTabId>("overview");
   const { confirm, dialog: confirmDialog } = useConfirm();
+
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (regenOpen && event.target instanceof Node && !((event.target as HTMLElement).closest?.(".ui-modal-card"))) {
+        setRegenOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, [regenOpen]);
 
   const uncovered = useMemo(
     () => new Set(kit.coverage.uncovered_requirement_ids),

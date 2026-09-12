@@ -308,7 +308,7 @@ function NewKitInner() {
           }}
         >
           <div
-            className="ui-modal-card ui-fade-up"
+            className="ui-modal-card ui-fade-up p-2"
             role="dialog"
             aria-modal="true"
             aria-labelledby={modalTitleId}
